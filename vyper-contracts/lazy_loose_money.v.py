@@ -27,3 +27,7 @@ def __init__():
 
 
 # ***** Public *****
+@public
+@constant
+def version() -> int128:
+    return 1
