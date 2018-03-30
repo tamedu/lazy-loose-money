@@ -66,11 +66,19 @@ def version() -> int128:
 # ***** Public *****
 @public
 @payable
-def create_commitment() -> bool:
+def create_commitment(_title: bytes <= 300) -> bool:
     committer: address = msg.sender
     if (self.commitments[committer].owner != 0x0000000000000000000000000000000000000000
             and self.commitments[msg.sender].state != self.State.Closed):
         return False
     else:
+        self.commitments[committer].title = _title
+        self.commitments[committer].started_at = block.timestamp
         self.commitments[committer].owner = committer
+        self.commitments[committer].deposit = msg.value
+
         return True
+
+@public
+def get_commitment_title(committer: address) -> bytes <= 300:
+    return self.commitments[committer].title
