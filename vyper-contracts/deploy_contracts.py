@@ -43,4 +43,4 @@ if contract_address:
 contract_instance = web3.eth.contract(abi=contract_abi, address=contract_address)
 
 # Calling contract method
-print('Contract version number: {}'.format(contract_instance.functions.version().call()))
+print('Contract version number: {}'.format(contract_instance.call().version()))
