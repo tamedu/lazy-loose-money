@@ -1,5 +1,4 @@
 from web3 import Web3, HTTPProvider
-from vyper import compiler
 from web3.contract import ConciseContract
 from time import sleep
 
