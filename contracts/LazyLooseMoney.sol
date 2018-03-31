@@ -83,7 +83,7 @@ contract Commitment {
     public
     payable
     {
-        require(_days >= 3);
+        require(_days > 0);
         /* require(msg.value >= _days * 1 finney); */
         owner = _creator;
         deposit = msg.value;
@@ -107,6 +107,7 @@ contract Commitment {
     event Started(address indexed commitment, address indexed owner, uint startedAt, uint finishedAt);
     event Guarded(address indexed commitment, address indexed owner, address indexed guardian, uint guardianDeposit, uint guardedAt);
     event Reported(address indexed commitment, address indexed owner, address indexed guardian, bool completed, uint reportedAt);
+    event Closed(address indexed commitment, address indexed owner, uint dayscount, uint reportedDays, uint completedDays, uint ownerReward, uint guardianReward, uint closedAt);
 
     /* public functions */
     function getInfo()
@@ -143,11 +144,13 @@ contract Commitment {
     {
         require(msg.sender == guardian || msg.sender == owner);
         require(now > finishedAt);
-        uint total = balance;
-        uint x = total / (completedDays + reportedDays);
+        uint x = this.balance / (completedDays + reportedDays);
         uint y = x * reportedDays;
+        x = this.balance - y;
         guardian.transfer(y);
-        owner.transfer(total - y);
+        owner.transfer(x);
+        state = State.Closed;
+        emit Closed(this, owner, daysCount, reportedDays, completedDays, x, y, now);
     }
 
     function beGuardian()
