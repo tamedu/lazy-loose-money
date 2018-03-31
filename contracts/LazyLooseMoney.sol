@@ -6,6 +6,9 @@ contract LlmFactory {
     address[] public commitments; // store all commitment contract addresses
     mapping(address => address) public currentCommitment; // current commitment contract address of msg.sender
 
+    /* events to log */
+    event CommitmentCreated(address indexed owner, address commitment, string title, uint daysCount);
+
     function createCommitment(string _title, uint _days)
     public
     payable
@@ -15,6 +18,7 @@ contract LlmFactory {
         newCommitment = (new Commitment).value(msg.value)(msg.sender, _title, _days);
         commitments.push(newCommitment);
         currentCommitment[msg.sender] = newCommitment;
+        emit CommitmentCreated(msg.sender, newCommitment, _title, _days);
     }
 
     function getLastCommitmentAddress()
@@ -27,11 +31,12 @@ contract LlmFactory {
 }
 
 contract Commitment {
+    /* data structure */
     string public title;
     address public owner;
     address public guardian;
 
-    mapping(address => uint) supporterFunded;
+    mapping(address => uint) supportersFunded;
     uint deposited;
     uint burned;
 
@@ -55,6 +60,18 @@ contract Commitment {
     }
     mapping(uint => DailyReport) dailyReports;
 
+    /* modifiers */
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    modifier onlyGuardian() {
+        require(msg.sender == guardian);
+        _;
+    }
+
+    /* constructor */
     function Commitment(address _creator, string _title, uint _days)
     public
     payable
@@ -68,8 +85,14 @@ contract Commitment {
         state = State.Opened;
 
         createdAt = now;
+
+        emit Created(title, daysCount);
     }
 
+    /* events to log */
+    event Created(string title, uint daysCount);
+
+    /* public functions */
     function getInfo()
     public
     view
@@ -77,7 +100,23 @@ contract Commitment {
     {
         return (owner, title, daysCount);
     }
-}
+
+    function support(string encouragement)
+    public
+    payable
+    returns (uint)
+    {
+        supportersFunded[msg.sender] += msg.value;
+        /* emit */
+        return supportersFunded[msg.sender];
+    }
+    /* owner functions */
+
+    /* guardian functions */
+
+    /* helpers */
+
+} // end Commitment construct
 
 /*
 // https://blog.aragon.one/advanced-solidity-code-deployment-techniques-dc032665f434
