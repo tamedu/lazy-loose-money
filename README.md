@@ -3,15 +3,13 @@
 ## Smart contract development environment setup
 ### Install python3 and dependencies
 ```
-brew install python3
-pip3 install --upgrade pip
 pip install -r requirements.txt
 # install and run `ganache-cli` server
-brew install npm
 npm install -g ganache-cli
-ganache-cli
+ganache-cli -p 7545
+# or download & run the GUI version at http://truffleframework.com/ganache
 # then
-python3 llm.py
+python llm.py
 ```
 
 ## Reference

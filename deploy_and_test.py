@@ -1,12 +1,10 @@
 from web3 import Web3, HTTPProvider
-from web3.contract import ConciseContract
 from time import sleep
 
 '''
-Run `ganache-cli`
+Remember to run `ganache-cli -p 7545`
 '''
-web3 = Web3(HTTPProvider('http://localhost:8545'))
-# print(web3.personal.listAccounts)
+web3 = Web3(HTTPProvider('http://localhost:7545'))
 
 def deploy_contract(**config):
     deployer = web3.personal.listAccounts[0]
@@ -31,7 +29,24 @@ def deploy_contract(**config):
     if contract_address:
         print('Contract deployed at:', contract_address)
 
-    # Contract instance in concise mode
-    # contract_instance = web3.eth.contract(abi=contract_abi, address=contract_address, ContractFactoryClass=ConciseContract)
     contract_instance = web3.eth.contract(abi=config['abi'], address=contract_address)
     return contract_instance
+
+# Details at https://github.com/ethereum/py-solc
+from solc import compile_source
+compile_source
+contract_file = open('contracts/LazyLooseMoney.sol', 'r')
+contract_code = contract_file.read()
+contract_file.close()
+compiled = compile_source(contract_code)
+compiled_llm_factory = compiled['<stdin>:LlmFactory']
+compiled_commitment = compiled['<stdin>:Commitment']
+# print(compiled_commitment)
+
+committer = web3.personal.listAccounts[1]
+llm_factory = deploy_contract(abi=compiled_llm_factory['abi'], bytecode=compiled_llm_factory['bin'])
+txn = llm_factory.transact({'from': committer, 'value': web3.toWei(50000, 'gwei')}).createCommitment("my commitment for next 30 days", 30)
+commitment_address = llm_factory.call().getLastCommitmentAddress();
+print('Get commitment contract at', commitment_address)
+commitment_contract = web3.eth.contract(abi = compiled_commitment['abi'], address = commitment_address)
+print(commitment_contract.call().getInfo());
