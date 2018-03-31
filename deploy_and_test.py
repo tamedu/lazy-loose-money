@@ -64,7 +64,8 @@ committer = web3.personal.listAccounts[0]
 title = "my commitment for next 30 days"
 days = 30
 
-tx_hash = llm_factory.functions.createCommitment(title, days).transact({'from': committer, 'value': web3.toWei(50000, 'gwei')})
+deposit = web3.toWei(50000, 'gwei')
+tx_hash = llm_factory.functions.createCommitment(title, days).transact({'from': committer, 'value': deposit})
 tx_receipt = wait_for_transaction(tx_hash)
 
 last_events = commitment_created_filter.get_new_entries()
@@ -82,3 +83,4 @@ print('found:', _title)
 assert _owner == committer
 assert _title == title
 assert _days == days
+assert web3.eth.getBalance(commitment_address) == deposit
