@@ -121,3 +121,12 @@ if len(last_events) > 0:
 info = commitment_contract.functions.getInfo().call()
 print(info)
 assert info[-1] - info[-2] == 24*60*60 * days
+
+
+filter = commitment_contract.eventFilter("Reported", {'fromBlock': None})
+tx_hash = commitment_contract.functions.report(True).transact({'from': guardian})
+tx_receipt = wait_for_transaction(tx_hash)
+last_events = filter.get_all_entries()
+print(len(last_events), 'events found.')
+if len(last_events) > 0:
+    print(last_events[-1])

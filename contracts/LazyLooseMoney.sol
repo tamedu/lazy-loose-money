@@ -42,6 +42,9 @@ contract Commitment {
     uint burned;
 
     uint daysCount;
+    uint reportedDays;
+    uint completedDays;
+
     uint createdAt;
     uint startedAt;
     uint guardedAt;
@@ -59,6 +62,8 @@ contract Commitment {
     struct DailyReport {
         bool completed; // guardian report if the commitment for today is completed or not
         bool complained; // owner can complain about daily_report correctness or not
+        // https://ethereum.stackexchange.com/questions/13021/how-can-you-figure-out-if-a-certain-key-exists-in-a-mapping-struct-defined-insi
+        bool reported;
     }
     mapping(uint => DailyReport) dailyReports;
 
@@ -86,6 +91,8 @@ contract Commitment {
 
         title = _title;
         daysCount = _days;
+        reportedDays = 0;
+        completedDays = 0;
         state = State.Opened;
 
         createdAt = now;
@@ -99,14 +106,15 @@ contract Commitment {
     event fundAdded(address indexed commitment, address indexed supporter, uint value, string encouragement);
     event Started(address indexed commitment, address indexed owner, uint startedAt, uint finishedAt);
     event Guarded(address indexed commitment, address indexed owner, address indexed guardian, uint guardianDeposit, uint guardedAt);
+    event Reported(address indexed commitment, address indexed owner, address indexed guardian, bool completed, uint reportedAt);
 
     /* public functions */
     function getInfo()
     public
     view
-    returns (address, string, uint, uint, uint, uint, uint)
+    returns (address, string, uint, uint, uint, State, uint, uint)
     {
-        return (owner, title, deposit, guardianDeposit, daysCount, startedAt, finishedAt);
+        return (owner, title, deposit, guardianDeposit, daysCount, state, startedAt, finishedAt);
     }
 
     function supportFund(string encouragement)
@@ -130,6 +138,17 @@ contract Commitment {
     }
 
     /* guardian functions */
+    function release()
+    public
+    {
+        require(msg.sender == guardian || msg.sender == owner);
+        require(now > finishedAt);
+        uint total = balance;
+        uint x = total / (completedDays + reportedDays);
+        uint y = x * reportedDays;
+        guardian.transfer(y);
+        owner.transfer(total - y);
+    }
 
     function beGuardian()
     public
@@ -145,6 +164,23 @@ contract Commitment {
         emit Guarded(this, owner, guardian, guardianDeposit, guardedAt);
     }
 
+    function report(bool completed)
+    public
+    onlyGuardian()
+    {
+        require(state == State.Started);
+        require(now < finishedAt + 23 hours);
+        uint _days = (now - startedAt) / 1 days;
+        require(_days < daysCount);
+        require(!dailyReports[_days].reported);
+        reportedDays = reportedDays + 1;
+        if (completed) {
+            completedDays = completedDays + 1;
+        }
+        dailyReports[_days].reported = true;
+        dailyReports[_days].completed = completed;
+        emit Reported(this, owner, guardian, completed, now);
+    }
     /* helpers */
 
 } // end Commitment construct
