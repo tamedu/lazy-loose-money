@@ -25,12 +25,14 @@ make test
 ```
 cd lazy-loose-money/vyper-contracts
 vyper lazy_loose_money.v.py
+pytest test_lazy_loose_money.py
 ```
 
 ### Install web3py
 ```
 pip install -r requirements.txt
-
+# install and run `ganache-cli` (goolge if needed)
+python3 llm.py
 ```
 
 ## Reference

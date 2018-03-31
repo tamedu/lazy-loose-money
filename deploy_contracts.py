@@ -3,7 +3,7 @@ from web3.contract import ConciseContract
 from time import sleep
 
 '''
-Run `ganach-cli`
+Run `ganache-cli`
 '''
 web3 = Web3(HTTPProvider('http://localhost:8545'))
 # print(web3.personal.listAccounts)
