@@ -13,13 +13,8 @@ brew tap ethereum/ethereum
 brew install ethereum
 ```
 ### Init your local ethereum for the first time
-Remember to below comment to init local chain data
 ```
 ./init_chain.sh
-```
-Then run bellow command three times to create test accounts
-```
-geth account new --password passwords.txt --datadir ./chain_data
 ```
 
 ### Start `geth`server to deploy and test
