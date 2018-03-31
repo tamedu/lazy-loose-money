@@ -3,7 +3,8 @@
 ## Smart contract development environment setup
 Install `python`, `web3py` beta and `py-solc`
 ```
-brew install python3
+brew tap ethereum/ethereum
+brew install python3 solidity
 pip3 install --upgrade pip
 pip install web3==4.0.0b13
 pip install py-solc
