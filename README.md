@@ -1,9 +1,9 @@
 # Lazy Loose Money
 
 ## Smart contract development environment setup
-### Install python3 and dependencies
+### Install python and dependencies
 ```
-pip install -r requirements.txt
+pip install web3==4.0.0b13
 # install and run `ganache-cli` server
 npm install -g ganache-cli
 ganache-cli -p 7545

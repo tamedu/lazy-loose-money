@@ -9,7 +9,7 @@ web3 = Web3(HTTPProvider('http://localhost:7545'))
 def deploy_contract(**config):
     deployer = web3.personal.listAccounts[0]
     contract = web3.eth.contract(abi=config['abi'], bytecode=config['bytecode'])
-    tx_hash = contract.deploy(transaction={'from': deployer, 'gas': 910000})
+    tx_hash = contract.constructor().transact(transaction={'from': deployer, 'gas': 910000})
 
     # Waiting for contract to be deployed
     i = 0
@@ -45,8 +45,8 @@ compiled_commitment = compiled['<stdin>:Commitment']
 
 committer = web3.personal.listAccounts[1]
 llm_factory = deploy_contract(abi=compiled_llm_factory['abi'], bytecode=compiled_llm_factory['bin'])
-txn = llm_factory.transact({'from': committer, 'value': web3.toWei(50000, 'gwei')}).createCommitment("my commitment for next 30 days", 30)
-commitment_address = llm_factory.call().getLastCommitmentAddress();
+txn = llm_factory.functions.createCommitment("my commitment for next 30 days", 30).transact({'from': committer, 'value': web3.toWei(50000, 'gwei')})
+commitment_address = llm_factory.functions.getLastCommitmentAddress().call()
 print('Get commitment contract at', commitment_address)
 commitment_contract = web3.eth.contract(abi = compiled_commitment['abi'], address = commitment_address)
-print(commitment_contract.call().getInfo());
+print(commitment_contract.functions.getInfo().call())
