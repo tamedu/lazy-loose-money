@@ -12,28 +12,18 @@ install and run `geth`
 brew tap ethereum/ethereum
 brew install ethereum
 ```
-### Init your local ethereum
-Remember to run
+### Init your local ethereum for the first time
+Remember to below comment to init local chain data
 ```
-cp run_chain.sh.example run_chain.sh
+./init_chain.sh
 ```
-Then run bellow command three times
+Then run bellow command three times to create test accounts
 ```
-geth account new --password passwords.txt
-```
-
-You will get something like
-```
-Address: {833cdf83f94fd6fab42437767fd69082e2adefc9}
+geth account new --password passwords.txt --datadir ./chain_data
 ```
 
-Get value within `{...}`, add `0x` to the account address header. For example: `0x833cdf83f94fd6fab42437767fd69082e2adefc9`
-
-Then add newly created account addresses to `run_chain.sh`'s `--unlock ...` option. For example:
-```
---unlock 0x6ab64ad9aa10269ac7ecde58875562a29109104e,0x259e9eab6e0b032e69b6cc75c41f7fc388d9cbdd,0x833cdf83f94fd6fab42437767fd69082e2adefc9
-```
-Then start geth server
+### Start `geth`server to deploy and test
+Start geth server
 ```
 ./run_chain.sh
 ```

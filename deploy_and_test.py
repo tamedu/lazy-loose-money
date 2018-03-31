@@ -3,16 +3,13 @@ from time import sleep
 import binascii
 
 '''
-Remember to run `cp run_chain.sh.example run_chain.sh`
-Then run `geth account new --password passwords.txt` (use `demo` as the default passphrase)
-You will get something like `Address: {833cdf83f94fd6fab42437767fd69082e2adefc9}`
-Get value within {...}, add `0x` to the account address header
-For example: `0x833cdf83f94fd6fab42437767fd69082e2adefc9`
-Then add newly created account addresses to `run_chain.sh`'s `--unlock ...` option
-For example: `--unlock 0x6ab64ad9aa10269ac7ecde58875562a29109104e,0x259e9eab6e0b032e69b6cc75c41f7fc388d9cbdd,0x833cdf83f94fd6fab42437767fd69082e2adefc9`
-Then start geth server `./run_chain.sh`
+Remember to run `./run_chain.sh`
 '''
 web3 = Web3(HTTPProvider('http://localhost:8545'))
+
+web3.personal.unlockAccount(web3.personal.listAccounts[0], 'demo')
+web3.personal.unlockAccount(web3.personal.listAccounts[1], 'demo')
+web3.personal.unlockAccount(web3.personal.listAccounts[2], 'demo')
 
 def wait_for_transaction(tx_hash):
     print('Waiting for tx_hash:', binascii.hexlify(tx_hash).decode('ascii'))
