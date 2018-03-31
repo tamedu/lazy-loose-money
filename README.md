@@ -15,6 +15,8 @@ python llm.py
 ## Reference
 http://www.stickk.com/tour/3
 
+It’s important to know what your goal is. **But it’s more important to know what it’ll take you to actually accomplish your goal.**
+
 The possibility of losing money? A Referee who verifies your reports? Supporters who cheer you on along the way? Everyone’s different.
 
 Stickk data shows that creating a Commitment Contract with:
