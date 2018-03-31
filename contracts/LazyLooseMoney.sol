@@ -43,7 +43,7 @@ contract Commitment {
     uint daysCount;
     uint startedAt;
     uint createdAt;
-    uint closedAt;
+    uint finishedAt;
 
     enum State {
         Opened,
@@ -86,20 +86,21 @@ contract Commitment {
 
         createdAt = now;
 
-        emit Created(this, title, daysCount);
+        emit Created(this, owner, title, createdAt, daysCount);
     }
 
     /* events to log */
-    event Created(address indexed commitment, string title, uint daysCount);
-    event fundAdded(address indexed supporter, uint value, string encouragement);
+    event Created(address indexed commitment, address indexed commiter, string title, uint createdAt, uint daysCount);
+    event fundAdded(address indexed commitment, address indexed supporter, uint value, string encouragement);
+    event Commited(address indexed commitment, address indexed commiter, uint startedAt, uint finishedAt);
 
     /* public functions */
     function getInfo()
     public
     view
-    returns (address, string, uint)
+    returns (address, string, uint, uint)
     {
-        return (owner, title, daysCount);
+        return (owner, title, daysCount, finishedAt);
     }
 
     function supportFund(string encouragement)
@@ -107,9 +108,18 @@ contract Commitment {
     payable
     {
         supportersFunded[msg.sender] += msg.value;
-        emit fundAdded(msg.sender, msg.value, encouragement);
+        emit fundAdded(this, msg.sender, msg.value, encouragement);
     }
     /* owner functions */
+
+    function commit()
+    public
+    onlyOwner()
+    {
+        startedAt = now;
+        finishedAt = startedAt + daysCount * 1 days;
+        emit Commited(this, owner, startedAt, finishedAt);
+    }
 
     /* guardian functions */
 

@@ -12,28 +12,24 @@ web3.personal.unlockAccount(web3.personal.listAccounts[1], 'demo')
 web3.personal.unlockAccount(web3.personal.listAccounts[2], 'demo')
 
 ONE_ETH_IN_WEI = 10**18
-web3.eth.sendTransaction({'value':ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[0],'from':web3.eth.coinbase})
-web3.eth.sendTransaction({'value':ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[1],'from':web3.eth.coinbase})
-web3.eth.sendTransaction({'value':ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[2],'from':web3.eth.coinbase})
+web3.eth.sendTransaction({'value':5*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[0],'from':web3.eth.coinbase})
+web3.eth.sendTransaction({'value':2*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[1],'from':web3.eth.coinbase})
+web3.eth.sendTransaction({'value':2*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[2],'from':web3.eth.coinbase})
 
 
 def wait_for_transaction(tx_hash):
     print('Waiting for tx_hash:', binascii.hexlify(tx_hash).decode('ascii'))
-    for i in range(0, 8):
-        try:
-            tx_receipt = web3.eth.getTransactionReceipt(tx_hash)
-            if tx_receipt:
-                return tx_receipt
-            else:
-                print("Reading failure for {} time(s)".format(i + 1))
-                sleep(3+i)
-        except:
-            print("Reading failure for {} time(s)".format(i + 1))
-            sleep(3+i)
+    for i in range(0, 10):
+        tx_receipt = web3.eth.getTransactionReceipt(tx_hash)
+        if tx_receipt:
+            return tx_receipt
+        else:
+            print(" ... wating for {} second(s)".format(i+1))
+            sleep(i+1)
     raise Exception("Cannot wait for transaction")
 
 def deploy_contract(**config):
-    deployer = web3.personal.listAccounts[0]
+    deployer = web3.eth.coinbase
     contract = web3.eth.contract(abi=config['abi'], bytecode=config['bytecode'])
     # tx_hash = contract.deploy(transaction={'from': deployer})
     tx_hash = contract.constructor().transact(transaction={'from': deployer})
@@ -84,11 +80,11 @@ for event in last_events:
 commitment_address = last_events[-1].args.commitment
 print('Get commitment contract at', commitment_address)
 commitment_contract = web3.eth.contract(abi = compiled_commitment['abi'], address = commitment_address)
-(_owner, _title, _days) = commitment_contract.functions.getInfo().call()
-print('found:', _title)
-assert _owner == committer
-assert _title == title
-assert _days == days
+info = commitment_contract.functions.getInfo().call()
+print('found:', info[1])
+assert committer == info[0]
+assert title == info[1]
+assert days == info[2]
 assert web3.eth.getBalance(commitment_address) == deposit
 
 filter = commitment_contract.eventFilter("fundAdded", {'fromBlock': 'latest'})
@@ -106,3 +102,11 @@ assert web3.eth.getBalance(commitment_address) == deposit + supportValue
 last_events = filter.get_new_entries()
 # print(last_events)
 assert last_events[-1].args.encouragement == encouragement
+
+
+filter = commitment_contract.eventFilter("Commited", {'fromBlock': 'latest'})
+commitment_contract.functions.commit().call({'from': supporter})
+sleep(3)
+last_events = filter.get_new_entries()
+print(len(last_events), 'events found.')
+print(last_events)
