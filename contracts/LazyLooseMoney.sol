@@ -36,7 +36,7 @@ contract Commitment {
     address public owner;
     address public guardian;
 
-    mapping(address => uint) supportersFunded;
+    mapping(address => uint) public supportersFunded;
     uint deposited;
     uint burned;
 
@@ -86,11 +86,12 @@ contract Commitment {
 
         createdAt = now;
 
-        emit Created(title, daysCount);
+        emit Created(this, title, daysCount);
     }
 
     /* events to log */
-    event Created(string title, uint daysCount);
+    event Created(address indexed commitment, string title, uint daysCount);
+    event fundAdded(address indexed supporter, uint value, string encouragement);
 
     /* public functions */
     function getInfo()
@@ -101,14 +102,12 @@ contract Commitment {
         return (owner, title, daysCount);
     }
 
-    function support(string encouragement)
+    function supportFund(string encouragement)
     public
     payable
-    returns (uint)
     {
         supportersFunded[msg.sender] += msg.value;
-        /* emit */
-        return supportersFunded[msg.sender];
+        emit fundAdded(msg.sender, msg.value, encouragement);
     }
     /* owner functions */
 

@@ -18,7 +18,7 @@ brew install ethereum
 ./init_chain.sh
 ```
 
-### Start `geth`server to deploy and test
+### Start `geth` server to deploy and test
 Start geth server
 ```
 ./run_chain.sh
