@@ -1,11 +1,12 @@
 # Lazy Loose Money
 
 ## Smart contract development environment setup
-Install `python` and `web3py` beta
+Install `python`, `web3py` beta and `py-solc`
 ```
 brew install python3
 pip3 install --upgrade pip
 pip install web3==4.0.0b13
+pip install py-solc
 ```
 install and run `geth`
 ```
@@ -50,3 +51,10 @@ Stickk data shows that creating a Commitment Contract with:
 * Financial stakes increase your chances of success by up to 3x
 
 What will it take for you?
+
+### Create a virtualenv
+```
+pip install virtualenv
+virtualenv -p python3.6 --no-site-packages ~/my-venv
+source ~/my-venv/bin/activate
+```
