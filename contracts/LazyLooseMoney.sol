@@ -37,12 +37,14 @@ contract Commitment {
     address public guardian;
 
     mapping(address => uint) public supportersFunded;
-    uint deposited;
+    uint deposit;
+    uint guardianDeposit;
     uint burned;
 
     uint daysCount;
-    uint startedAt;
     uint createdAt;
+    uint startedAt;
+    uint guardedAt;
     uint finishedAt;
 
     enum State {
@@ -76,8 +78,10 @@ contract Commitment {
     public
     payable
     {
+        require(_days >= 3);
+        /* require(msg.value >= _days * 1 finney); */
         owner = _creator;
-        deposited = msg.value;
+        deposit = msg.value;
         burned = 0;
 
         title = _title;
@@ -85,22 +89,24 @@ contract Commitment {
         state = State.Opened;
 
         createdAt = now;
+        guardianDeposit = 2*(deposit / daysCount);
 
-        emit Created(this, owner, title, createdAt, daysCount);
+        emit Created(this, owner, deposit, title, createdAt, daysCount);
     }
 
     /* events to log */
-    event Created(address indexed commitment, address indexed commiter, string title, uint createdAt, uint daysCount);
+    event Created(address indexed commitment, address indexed owner, uint deposit, string title, uint createdAt, uint daysCount);
     event fundAdded(address indexed commitment, address indexed supporter, uint value, string encouragement);
-    event Commited(address indexed commitment, address indexed commiter, uint startedAt, uint finishedAt);
+    event Started(address indexed commitment, address indexed owner, uint startedAt, uint finishedAt);
+    event Guarded(address indexed commitment, address indexed owner, address indexed guardian, uint guardianDeposit, uint guardedAt);
 
     /* public functions */
     function getInfo()
     public
     view
-    returns (address, string, uint, uint)
+    returns (address, string, uint, uint, uint, uint, uint)
     {
-        return (owner, title, daysCount, finishedAt);
+        return (owner, title, deposit, guardianDeposit, daysCount, startedAt, finishedAt);
     }
 
     function supportFund(string encouragement)
@@ -116,12 +122,28 @@ contract Commitment {
     public
     onlyOwner()
     {
+        require(state == State.Guarded);
         startedAt = now;
         finishedAt = startedAt + daysCount * 1 days;
-        emit Commited(this, owner, startedAt, finishedAt);
+        state = State.Started;
+        emit Started(this, owner, startedAt, finishedAt);
     }
 
     /* guardian functions */
+
+    function beGuardian()
+    public
+    payable
+    {
+        require(guardian == 0x0);
+        require(msg.sender != owner);
+        require(msg.value >= guardianDeposit);
+        guardian = msg.sender;
+        guardianDeposit = msg.value;
+        state = State.Guarded;
+        guardedAt = now;
+        emit Guarded(this, owner, guardian, guardianDeposit, guardedAt);
+    }
 
     /* helpers */
 

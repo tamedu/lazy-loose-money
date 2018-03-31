@@ -12,9 +12,9 @@ web3.personal.unlockAccount(web3.personal.listAccounts[1], 'demo')
 web3.personal.unlockAccount(web3.personal.listAccounts[2], 'demo')
 
 ONE_ETH_IN_WEI = 10**18
-web3.eth.sendTransaction({'value':5*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[0],'from':web3.eth.coinbase})
-web3.eth.sendTransaction({'value':2*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[1],'from':web3.eth.coinbase})
-web3.eth.sendTransaction({'value':2*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[2],'from':web3.eth.coinbase})
+web3.eth.sendTransaction({'value':3*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[0],'from':web3.eth.coinbase})
+web3.eth.sendTransaction({'value':1*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[1],'from':web3.eth.coinbase})
+web3.eth.sendTransaction({'value':1*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[2],'from':web3.eth.coinbase})
 
 
 def wait_for_transaction(tx_hash):
@@ -81,32 +81,43 @@ commitment_address = last_events[-1].args.commitment
 print('Get commitment contract at', commitment_address)
 commitment_contract = web3.eth.contract(abi = compiled_commitment['abi'], address = commitment_address)
 info = commitment_contract.functions.getInfo().call()
-print('found:', info[1])
+print('found:', info)
 assert committer == info[0]
 assert title == info[1]
-assert days == info[2]
+assert days == info[4]
 assert web3.eth.getBalance(commitment_address) == deposit
 
-filter = commitment_contract.eventFilter("fundAdded", {'fromBlock': 'latest'})
-last_events = filter.get_new_entries()
-print(len(last_events), 'events found.')
-for event in last_events:
-    print(event)
-
+'''
+filter = commitment_contract.eventFilter("fundAdded", {'fromBlock': None})
 supporter = web3.personal.listAccounts[2]
 supportValue = web3.toWei(1000, 'gwei')
 encouragement = 'you can do it'
 tx_hash = commitment_contract.functions.supportFund(encouragement).transact({'from': supporter, 'value': supportValue})
 tx_receipt = wait_for_transaction(tx_hash)
 assert web3.eth.getBalance(commitment_address) == deposit + supportValue
-last_events = filter.get_new_entries()
-# print(last_events)
-assert last_events[-1].args.encouragement == encouragement
-
-
-filter = commitment_contract.eventFilter("Commited", {'fromBlock': 'latest'})
-commitment_contract.functions.commit().call({'from': supporter})
-sleep(3)
-last_events = filter.get_new_entries()
-print(len(last_events), 'events found.')
+last_events = filter.get_all_entries()
 print(last_events)
+assert last_events[-1].args.encouragement == encouragement
+'''
+
+guardian = web3.personal.listAccounts[1]
+guardianDeposit = round(2 * deposit / days) + 1;
+filter = commitment_contract.eventFilter("Guarded", {'fromBlock': None})
+tx_hash = commitment_contract.functions.beGuardian().transact({'from': guardian, 'value': guardianDeposit})
+tx_receipt = wait_for_transaction(tx_hash)
+last_events = filter.get_all_entries()
+print(len(last_events), 'events found.')
+if len(last_events) > 0:
+    print(last_events[-1])
+
+
+filter = commitment_contract.eventFilter("Started", {'fromBlock': None})
+tx_hash = commitment_contract.functions.commit().transact({'from': committer})
+tx_receipt = wait_for_transaction(tx_hash)
+last_events = filter.get_all_entries()
+print(len(last_events), 'events found.')
+if len(last_events) > 0:
+    print(last_events[-1])
+info = commitment_contract.functions.getInfo().call()
+print(info)
+assert info[-1] - info[-2] == 24*60*60 * days
