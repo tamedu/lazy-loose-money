@@ -4,7 +4,7 @@ contract LlmFactory {
 
     // contract address storge
     address[] public commitments; // store all commitment contract addresses
-    mapping(address => address) currentCommitment; // current commitment contract address of msg.sender
+    mapping(address => address) public currentCommitment; // current commitment contract address of msg.sender
 
     /* events to log */
     event CommitmentCreated(address indexed owner, address commitment, string title, uint daysCount);
@@ -29,7 +29,7 @@ contract LlmFactory {
         emit CommitmentCreated(msg.sender, newCommitment, _title, _days);
     }
 
-    function getCurrentCommitment()
+    function getCurrentCommitmentAddress()
     public
     view
     returns (address)

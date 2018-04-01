@@ -70,6 +70,8 @@ deposit = web3.toWei(50000, 'gwei')
 tx_hash = llm_factory.functions.createCommitment(title, days).transact({'from': committer, 'value': deposit})
 tx_receipt = wait_for_transaction(tx_hash)
 
+# raise SystemExit(0)
+
 last_events = commitment_created_filter.get_all_entries()
 print(len(last_events), 'events found.')
 for event in last_events:
