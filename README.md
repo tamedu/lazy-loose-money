@@ -1,3 +1,7 @@
+https://tamedu.github.io/lazy-loose-money
+
+Running on `Ropsten Testnet`, contract address [0x34bdced976429993238aeb44347a8f9ce23d25d2](https://ropsten.etherscan.io/address/0x34bdced976429993238aeb44347a8f9ce23d25d2)
+
 # Lazy Loose Money
 
 Let say that i want to do running for 1 hour everyday for 100 days. I create a contract and deposit $100 in it. Everyday, I need to (somehow) inform the contract that I finish my running or not. Then after 100 days passed, depend on the completeness of my report, the contract will do some punishment. For example: lock $100 for 10 more-day for each day I did not do the running. So if I skip running for 6 day, the money will be lock there for 2-months. Other kinds of punishment could be: Burn a part of deposit money, give it to someone ...
