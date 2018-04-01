@@ -4,7 +4,7 @@ contract LlmFactory {
 
     // contract address storge
     address[] public commitments; // store all commitment contract addresses
-    mapping(address => address) public currentCommitment; // current commitment contract address of msg.sender
+    mapping(address => address) currentCommitment; // current commitment contract address of msg.sender
 
     /* events to log */
     event CommitmentCreated(address indexed owner, address commitment, string title, uint daysCount);
@@ -19,6 +19,14 @@ contract LlmFactory {
         commitments.push(newCommitment);
         currentCommitment[msg.sender] = newCommitment;
         emit CommitmentCreated(msg.sender, newCommitment, _title, _days);
+    }
+
+    function getCurrentCommitment()
+    public
+    view
+    returns (address)
+    {
+        return currentCommitment[msg.sender];
     }
 
     function getLastCommitmentAddress()
@@ -138,12 +146,28 @@ contract Commitment {
         emit Started(this, owner, startedAt, finishedAt);
     }
 
+    function cancel()
+    public
+    onlyOwner()
+    {
+        require(now < finishedAt);
+        require(state != State.Closed);
+        // You loose half money
+        uint x = this.balance / 2;
+        uint y = this.balance - x;
+        guardian.transfer(y);
+        owner.transfer(x);
+        state = State.Closed;
+        emit Closed(this, owner, daysCount, reportedDays, completedDays, x, y, now);
+    }
+
     /* guardian functions */
     function release()
     public
     {
         require(msg.sender == guardian || msg.sender == owner);
         require(now > finishedAt);
+        require(state != State.Closed);
         uint x = this.balance / (completedDays + reportedDays);
         uint y = x * reportedDays;
         x = this.balance - y;

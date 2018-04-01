@@ -130,3 +130,11 @@ last_events = filter.get_all_entries()
 print(len(last_events), 'events found.')
 if len(last_events) > 0:
     print(last_events[-1])
+
+filter = commitment_contract.eventFilter("Closed", {'fromBlock': None})
+tx_hash = commitment_contract.functions.close().transact({'from': committer})
+tx_receipt = wait_for_transaction(tx_hash)
+last_events = filter.get_all_entries()
+print(len(last_events), 'events found.')
+if len(last_events) > 0:
+    print(last_events[-1])
