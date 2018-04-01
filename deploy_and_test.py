@@ -12,14 +12,14 @@ web3.personal.unlockAccount(web3.personal.listAccounts[1], 'demo')
 web3.personal.unlockAccount(web3.personal.listAccounts[2], 'demo')
 
 ONE_ETH_IN_WEI = 10**18
-web3.eth.sendTransaction({'value':3*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[0],'from':web3.eth.coinbase})
+web3.eth.sendTransaction({'value':5*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[0],'from':web3.eth.coinbase})
 web3.eth.sendTransaction({'value':1*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[1],'from':web3.eth.coinbase})
 web3.eth.sendTransaction({'value':1*ONE_ETH_IN_WEI,'to':web3.personal.listAccounts[2],'from':web3.eth.coinbase})
 
 
 def wait_for_transaction(tx_hash):
     print('Waiting for tx_hash:', binascii.hexlify(tx_hash).decode('ascii'))
-    for i in range(0, 10):
+    for i in range(0, 15):
         tx_receipt = web3.eth.getTransactionReceipt(tx_hash)
         if tx_receipt:
             return tx_receipt
@@ -70,7 +70,7 @@ deposit = web3.toWei(50000, 'gwei')
 tx_hash = llm_factory.functions.createCommitment(title, days).transact({'from': committer, 'value': deposit})
 tx_receipt = wait_for_transaction(tx_hash)
 
-last_events = commitment_created_filter.get_new_entries()
+last_events = commitment_created_filter.get_all_entries()
 print(len(last_events), 'events found.')
 for event in last_events:
     # print(event)
@@ -132,9 +132,21 @@ if len(last_events) > 0:
     print(last_events[-1])
 
 filter = commitment_contract.eventFilter("Closed", {'fromBlock': None})
-tx_hash = commitment_contract.functions.close().transact({'from': committer})
+tx_hash = commitment_contract.functions.cancel().transact({'from': committer})
 tx_receipt = wait_for_transaction(tx_hash)
 last_events = filter.get_all_entries()
 print(len(last_events), 'events found.')
 if len(last_events) > 0:
     print(last_events[-1])
+
+
+
+
+deposit = web3.toWei(3000, 'gwei')
+tx_hash = llm_factory.functions.createCommitment('Common let do it', 1).transact({'from': committer, 'value': deposit})
+tx_receipt = wait_for_transaction(tx_hash)
+
+last_events = commitment_created_filter.get_new_entries()
+print(len(last_events), 'events found.')
+for event in last_events:
+	print(str(event.args.owner) + ": ", str(event.args.commitment) + ",", event.args.title)
