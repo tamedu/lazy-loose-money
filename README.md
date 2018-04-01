@@ -30,6 +30,12 @@ Then run
 python3 deploy_and_test.py
 ```
 
+### Start the HTML app
+```
+python -m SimpleHTTPServer
+open http://localhost:8000/
+```
+
 ## References
 ### Web3py
 http://web3py.readthedocs.io/en/latest
