@@ -3,8 +3,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.1/css/tachyons.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="https://unpkg.com/web3@0.20.5/dist/web3.min.js"></script>
-    <!-- <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.min.js"></script> -->
 </head>
 
 <body class="black-80 sans-serif bg-near-white">
@@ -36,6 +34,11 @@
                             href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
                         <span class="pl1">Get current commitment</span>
                     </a>
+                    <a v-if="currentCommitment.state != null && State[currentCommitment.state]!='Closed'"
+                       v-on:click="cancelCurrentCommitment"
+                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
+                        <span class="pl1">Cancel current commitment</span>
+                    </a>
                 </article>
 
                 <article v-if='showCurrentCommitment' class="mw6 bg-white ba b--black-10 mv4">
@@ -46,10 +49,6 @@
                         <p>You deposited {{ currentCommitment.deposit }} ether(s).</p>
                         <p>You plan to finish your goal in {{ currentCommitment.daysCount }} day(s).</p>
                         <small class="gray db pv2"><time>Currently it is {{ State[currentCommitment.state] }}</time></small>
-                        <a v-if="State[currentCommitment.state]!='Closed'"
-                                href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
-                            <span class="pl1">Cancel</span>
-                        </a>
                     </div>
                 </article>
 
@@ -85,6 +84,50 @@
 </body>
 
 <script>
+
+var LlmFactoryContractAddress = '0x2B464028454c4824A9B9ebda99C53E2A1494ED43';
+
+function getCurrentCommitmentContractInstant() {
+    llmFactory.getCurrentCommitment(function(err, res) {
+        if (err) {
+            console.log(err.message);
+        } else {
+            console.log(res);
+            window.currentCommitment = commimentContract.at(res);
+        } // getCurrentCommitment
+    });
+}
+
+// https://codepen.io/k3no/pen/MEzvrV
+window.addEventListener("load", function() {
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    if (typeof web3 !== "undefined") {
+      // Use Mist/MetaMask's provider
+      window.web3 = new Web3(web3.currentProvider);
+    } else {
+      console.log("No web3? You should consider trying MetaMask!");
+    }
+
+    web3.eth.getAccounts(function(error, accounts) {
+        if (!error) {
+            web3.eth.getBalance(accounts[0], function(error, balance) {
+                if (!error) {
+                    app.address = accounts[0];
+                    app.value = balance.toNumber() / web3.toWei(1, 'ether');
+                } else {
+                    console.error(error);
+                }
+            });
+        } else {
+            console.error(error);
+        }
+    });
+
+    window.llmFactory = web3.eth.contract(LlmFactoryAbi).at(LlmFactoryContractAddress);
+    window.commimentContract = web3.eth.contract(CommitmentAbi);
+    getCurrentCommitmentContractInstant();
+});
+
 
 var State = [
     'Opened',
@@ -147,65 +190,19 @@ var app = new Vue({
               }
           });
       },
+      cancelCurrentCommitment() {
+          currentCommitment.cancel(function (err, res) {
+              if (err) {
+                  console.log(err.message);
+              } else {
+                  console.log(res);
+                  app.currentCommitment = {};
+                  app.showCurrentCommitment = false;
+              }
+          });
+      }
     }
 })
-
-/*
-currentCommitment.cancel(function (err, res) {
-    if (err) {
-        console.log(err.message);
-    } else {
-        console.log(res);
-    }
-});
-*/
-
-// https://codepen.io/k3no/pen/MEzvrV
-window.addEventListener("load", function() {
-    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-    if (typeof web3 !== "undefined") {
-      // Use Mist/MetaMask's provider
-      window.web3 = new Web3(web3.currentProvider);
-    } else {
-      console.log("No web3? You should consider trying MetaMask!");
-      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-      window.web3 = new Web3(
-        new Web3.providers.HttpProvider("http://localhost:8545")
-      );
-    }
-
-    web3.eth.getAccounts(function(error, accounts) {
-        if (!error) {
-            web3.eth.getBalance(accounts[0], function(error, balance) {
-                if (!error) {
-                    app.address = accounts[0];
-                    app.value = balance.toNumber() / web3.toWei(1, 'ether');
-                } else {
-                    console.error(error);
-                }
-            });
-        } else {
-            console.error(error);
-        }
-    });
-
-    window.llmFactory = web3.eth.contract(LlmFactoryAbi).at(LlmFactoryContractAddress);
-    window.commimentContract = web3.eth.contract(CommitmentAbi);
-    getCurrentCommitmentContractInstant();
-});
-
-function getCurrentCommitmentContractInstant() {
-    llmFactory.getCurrentCommitment(function(err, res) {
-        if (err) {
-            console.log(err.message);
-        } else {
-            console.log(res);
-            window.currentCommitment = commimentContract.at(res);
-        } // getCurrentCommitment
-    });
-}
-
-var LlmFactoryContractAddress = '0x2B464028454c4824A9B9ebda99C53E2A1494ED43';
 
 /* run `solc --abi contracts/LazyLooseMoney.sol` to get the ABI jsons */
 // ======= contracts/LazyLooseMoney.sol:Commitment =======
