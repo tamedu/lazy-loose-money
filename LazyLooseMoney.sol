@@ -60,6 +60,7 @@ contract Commitment {
     uint daysCount;
     uint reportedDays;
     uint completedDays;
+    uint pendingDays;
 
     uint createdAt;
     uint startedAt;
@@ -70,14 +71,14 @@ contract Commitment {
         Opened,
         Guarded,
         Started,
-        Pending,
         Closed
     }
     State state;
 
     struct DailyReport {
         bool completed; // guardian report if the commitment for today is completed or not
-        bool complained; // owner can complain about daily_report correctness or not
+        bool complained; // owner can complain about daily_report correctness
+        bool pending; // guardian can report a pending day if committer got sick ...
         // https://ethereum.stackexchange.com/questions/13021/how-can-you-figure-out-if-a-certain-key-exists-in-a-mapping-struct-defined-insi
         bool reported;
     }
@@ -109,6 +110,7 @@ contract Commitment {
         daysCount = _days;
         reportedDays = 0;
         completedDays = 0;
+        pendingDays = 0;
         state = State.Opened;
 
         createdAt = now;
