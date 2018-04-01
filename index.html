@@ -7,13 +7,78 @@
     <!-- <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.min.js"></script> -->
 </head>
 
-<body class="black-80">
+<body class="black-80 sans-serif bg-near-white">
     <main id="app" class="flex flex-column items-center">
         <div class="mw7 w-100 ph3 ph4-ns">
             <header>
-                <p>Your account {{ address }} has {{ value }} ether(s).</p>
-            </head>
+                <p class="pa2 black-70 bl bg-light-gray bw1 b--blue">
+                    Your account {{ address }} has {{ value }} ether(s).
+                </p>
+            </header>
+
             <div class="mw7 w-100 f5 f4-ns fw3 lh-copy mb0">
+                <div class="flex items-center justify-center pa4 bg-lightest-blue navy mb2">
+                  <svg class="w1" data-icon="info" viewBox="0 0 32 32" style="fill:currentcolor">
+                    <title>info icon</title>
+                    <path d="M16 0 A16 16 0 0 1 16 32 A16 16 0 0 1 16 0 M19 15 L13 15 L13 26 L19 26 z M16 6 A3 3 0 0 0 16 12 A3 3 0 0 0 16 6"></path>
+                  </svg>
+                  <span class="lh-title ml3">{{ notification }}</span>
+                </div>
+
+                <article v-if="!showCreateCommitmentForm">
+                    <a  v-if="State[currentCommitment.state]=='Closed'"
+                        v-on:click="newCommitment"
+                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
+                        <span class="pl1">New commitment</span>
+                    </a>
+                    <a  v-if="!showCurrentCommitment"
+                        v-on:click="getCurrentCommitment"
+                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
+                        <span class="pl1">Get current commitment</span>
+                    </a>
+                </article>
+
+                <article v-if='showCurrentCommitment' class="mw6 bg-white ba b--black-10 mv4">
+                    <div class="pv2 ph3">
+                        <h1 class="f6 ttu tracked">{{ currentCommitment.title }}</h1>
+                    </div>
+                    <div class="pa3">
+                        <p>You deposited {{ currentCommitment.deposit }} ether(s).</p>
+                        <p>You plan to finish your goal in {{ currentCommitment.daysCount }} day(s).</p>
+                        <small class="gray db pv2"><time>Currently it is {{ State[currentCommitment.state] }}</time></small>
+                        <a v-if="State[currentCommitment.state]!='Closed'"
+                                href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
+                            <span class="pl1">Cancel</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article v-if='showCreateCommitmentForm' class="bg-white pa4 black-80 mv4">
+                  <form accept-charset="utf-8">
+                    <fieldset id="sign_up" class="ba b--transparent ph0 mh0">
+                      <legend class="ph0 mh0 fw6 clip">Create Commitment</legend>
+                      <div class="mt3">
+                        <label class="db fw4 lh-copy f6" for="title">Titlte</label>
+                        <input v-model="commitment.title" class="pa2 input-reset ba bg-transparent w-100 measure" name="title">
+                      </div>
+                      <div class="mt3">
+                        <label class="db fw4 lh-copy f6" for="deposit">Deposit</label>
+                        <input v-model="commitment.deposit" class="b pa2 input-reset ba bg-transparent" name="deposit">
+                      </div>
+                      <div class="mt3">
+                        <label class="db fw4 lh-copy f6" for="daysCount">Days</label>
+                        <input v-model="commitment.daysCount" class="b pa2 input-reset ba bg-transparent" name="daysCount">
+                      </div>
+                    </fieldset>
+                    <div class="mt3">
+                        <a href="#" v-on:click="createCommitment"
+                                class="no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
+                            Create commitment
+                        </a>
+                    </div>
+                </form>
+                </article>
+
             </div>
         </div>
       </main>
@@ -21,12 +86,67 @@
 
 <script>
 
+var State = [
+    'Opened',
+    'Guarded',
+    'Started',
+    'Pending',
+    'Closed'
+];
+
 var app = new Vue({
-  el: '#app',
-  data: {
-    address: '0x0',
-    value: 0,
-  }
+    el: '#app',
+    data: {
+        address: '0x0',
+        value: 0,
+        currentCommitment: {},
+        commitment: {title: 'Running', deposit: 0.5, daysCount: 1},
+        showCurrentCommitment: false,
+        showCreateCommitmentForm: false,
+        notification: "Waiting for your command sir!",
+    },
+    methods: {
+      newCommitment() {
+          app.showCurrentCommitment = false;
+          app.showCreateCommitmentForm = true;
+          app.notification = "Please enter details ...";
+          window.setTimeout(function(){ app.notification = "Hurry up! I'm waiting ... " }, 3000);
+      },
+      createCommitment() {
+          var value = Math.round(parseFloat(app.commitment.deposit) * web3.toWei(1, 'ether'));
+          llmFactory.createCommitment(app.commitment.title,
+                parseInt(app.commitment.daysCount), {'value': value }, function(err, res) {
+              if (err) {
+                  console.log(err.message);
+              } else {
+                  console.log(res);
+              }
+          });
+
+          app.currentCommitment = {};
+          // app.commitment = {};
+          app.showCreateCommitmentForm = false;
+
+      },
+      getCurrentCommitment() {
+          app.notification = "Getting current commitment ...";
+          currentCommitment.getInfo(function (err, res) {
+              if (err) {
+                  console.log(err.message);
+              } else {
+                  console.log(res);
+                  app.currentCommitment = {
+                      title:  res[1],
+                      deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
+                      daysCount: res[4].toNumber(),
+                      state: res[5].toNumber(),
+                  }
+                  app.notification = "Here is your latest commitment sir!";
+                  app.showCurrentCommitment = true;
+              }
+          });
+      },
+    }
 })
 
 // https://codepen.io/k3no/pen/MEzvrV
@@ -67,46 +187,22 @@ window.addEventListener("load", function() {
         } else {
             console.log(res);
             window.currentCommitment = commimentContract.at(res);
-
-            currentCommitment.getInfo(function (err, res) {
-                if (err) {
-                    console.log(err.message);
-                } else {
-                    console.log(res);
-                }
-            });
-
-            currentCommitment.cancel(function (err, res) {
-                if (err) {
-                    console.log(err.message);
-                } else {
-                    console.log(res);
-                }
-            });
-
-            // valueInEth = 0.01;
-            // llmFactory.createCommitment('do it now', 1, {'value': web3.toWei(valueInEth, 'ether')}, function(err, res) {
-            //     if (err) {
-            //         console.log(err.message);
-            //     } else {
-            //         console.log(res);
-            //     }
-            // });
         } // getCurrentCommitment
     });
 
+/*
+currentCommitment.cancel(function (err, res) {
+    if (err) {
+        console.log(err.message);
+    } else {
+        console.log(res);
+    }
+});
+*/
 
-
-    llmFactory.commitments(0, function(err, res) {
-        if (err) {
-            console.log(err.message);
-        } else {
-            console.log(res);
-        }
-    });
 });
 
-var LlmFactoryContractAddress = '0x19F26aAdE06414889a09ba59aa0b386630c1AfDE';
+var LlmFactoryContractAddress = '0x2B464028454c4824A9B9ebda99C53E2A1494ED43';
 
 /* run `solc --abi contracts/LazyLooseMoney.sol` to get the ABI jsons */
 // ======= contracts/LazyLooseMoney.sol:Commitment =======
