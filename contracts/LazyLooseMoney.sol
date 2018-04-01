@@ -166,7 +166,7 @@ contract Commitment {
     public
     onlyOwner()
     {
-        require(now < finishedAt);
+        require(finishedAt > 0 && now < finishedAt);
         require(state != State.Closed);
         // You loose half money
         uint x = this.balance / 2;
