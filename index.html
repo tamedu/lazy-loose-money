@@ -120,11 +120,12 @@ var app = new Vue({
                   console.log(err.message);
               } else {
                   console.log(res);
+                  app.commitment = {};
+                  getCurrentCommitmentContractInstant();
               }
           });
 
           app.currentCommitment = {};
-          // app.commitment = {};
           app.showCreateCommitmentForm = false;
 
       },
@@ -148,6 +149,16 @@ var app = new Vue({
       },
     }
 })
+
+/*
+currentCommitment.cancel(function (err, res) {
+    if (err) {
+        console.log(err.message);
+    } else {
+        console.log(res);
+    }
+});
+*/
 
 // https://codepen.io/k3no/pen/MEzvrV
 window.addEventListener("load", function() {
@@ -180,7 +191,10 @@ window.addEventListener("load", function() {
 
     window.llmFactory = web3.eth.contract(LlmFactoryAbi).at(LlmFactoryContractAddress);
     window.commimentContract = web3.eth.contract(CommitmentAbi);
+    getCurrentCommitmentContractInstant();
+});
 
+function getCurrentCommitmentContractInstant() {
     llmFactory.getCurrentCommitment(function(err, res) {
         if (err) {
             console.log(err.message);
@@ -189,18 +203,7 @@ window.addEventListener("load", function() {
             window.currentCommitment = commimentContract.at(res);
         } // getCurrentCommitment
     });
-
-/*
-currentCommitment.cancel(function (err, res) {
-    if (err) {
-        console.log(err.message);
-    } else {
-        console.log(res);
-    }
-});
-*/
-
-});
+}
 
 var LlmFactoryContractAddress = '0x2B464028454c4824A9B9ebda99C53E2A1494ED43';
 
