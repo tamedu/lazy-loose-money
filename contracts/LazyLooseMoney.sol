@@ -13,7 +13,15 @@ contract LlmFactory {
     public
     payable
     {
-        require(currentCommitment[msg.sender] == 0x0);
+        bool noActiveCommitment = false;
+        if (currentCommitment[msg.sender] == 0x0) {
+            noActiveCommitment = true;
+        } else {
+            if  (Commitment(currentCommitment[msg.sender]).getState() == Commitment.State.Closed) {
+                noActiveCommitment = true;
+            }
+        }
+        /* require(noActiveCommitment); */
         address newCommitment;
         newCommitment = (new Commitment).value(msg.value)(msg.sender, _title, _days);
         commitments.push(newCommitment);
@@ -118,6 +126,14 @@ contract Commitment {
     event Closed(address indexed commitment, address indexed owner, uint dayscount, uint reportedDays, uint completedDays, uint ownerReward, uint guardianReward, uint closedAt);
 
     /* public functions */
+    function getState()
+    public
+    view
+    returns (State)
+    {
+        return state;
+    }
+
     function getInfo()
     public
     view
