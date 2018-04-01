@@ -24,7 +24,7 @@ Later, we can add more features:
 * More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my committent is.
 
 ## Smart contract development and deployment
-Copy Solidity code from `LazyLooseMoney.sol` and paste it to remix.ethereum.org
+Copy Solidity code from `LazyLooseMoney.sol` and paste it to http://remix.ethereum.org
 
 ## References
 ### web3j3
