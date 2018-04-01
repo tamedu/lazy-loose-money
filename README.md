@@ -18,47 +18,16 @@ I'm thinking of asking a friend (roommate for example) to do the checking for me
 
     - I will get the portion of deposit money according to the number of days I finished my commitment.
 
-We can add more features, like supporters can visit and give the commitment some fund. I can blame the guardian (did not report correctly, ...) and both I him will loose money ...
+Later, we can add more features:
+* Supporters can visit and give the commitment some fund.
+* I can blame the guardian (did not report correctly, ...) and both I him will loose money ...
+* More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my committent is.
 
-## Smart contract development environment setup
-Install `python`, `web3py` beta and `py-solc`
-```
-brew tap ethereum/ethereum
-brew install python3 solidity
-pip3 install --upgrade pip
-pip install web3==4.0.0b13
-pip install py-solc
-```
-install and run `geth`
-```
-brew tap ethereum/ethereum
-brew install ethereum
-```
-### Init your local ethereum for the first time
-```
-./init_chain.sh
-```
-
-### Start `geth` server to deploy and test
-Start geth server
-```
-./run_chain.sh
-```
-
-Then run
-```
-python3 deploy_and_test.py
-```
-
-### Start the HTML app
-```
-python -m SimpleHTTPServer
-open http://localhost:8000/
-```
+## Smart contract development and deployment
+Copy Solidity code from `LazyLooseMoney.sol` and paste it to remix.ethereum.org
 
 ## References
-### Web3
-http://web3py.readthedocs.io/en/latest/
+### web3j3
 https://github.com/ethereum/wiki/wiki/JavaScript-API
 
 ### solidity programming language
@@ -89,11 +58,3 @@ Stickk implemented the same idea. Can learn from it. Thanks [@joshpitzalis](http
 > * Financial stakes increase your chances of success by up to 3x
 >
 > What will it take for you?
-
-### Create a virtualenv
-Sometime you need to start from fresh, create a Python virtualenv is a good way to do it.
-```
-pip install virtualenv
-virtualenv -p python3.6 --no-site-packages ~/my-venv
-source ~/my-venv/bin/activate
-```

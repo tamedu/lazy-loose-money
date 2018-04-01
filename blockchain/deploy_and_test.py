@@ -44,7 +44,7 @@ def deploy_contract(**config):
 # Details at https://github.com/ethereum/py-solc
 from solc import compile_source
 compile_source
-contract_file = open('contracts/LazyLooseMoney.sol', 'r')
+contract_file = open('../LazyLooseMoney.sol', 'r')
 contract_code = contract_file.read()
 contract_file.close()
 compiled = compile_source(contract_code)
