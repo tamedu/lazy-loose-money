@@ -166,7 +166,6 @@ contract Commitment {
     public
     onlyOwner()
     {
-        require(finishedAt > 0 && now < finishedAt);
         require(state != State.Closed);
         // You loose half money
         uint x = this.balance / 2;
@@ -182,8 +181,8 @@ contract Commitment {
     public
     {
         require(msg.sender == guardian || msg.sender == owner);
+        require(state >= State.Started && state != State.Closed);
         require(now > finishedAt);
-        require(state != State.Closed);
         uint x = this.balance / (completedDays + reportedDays);
         uint y = x * reportedDays;
         x = this.balance - y;
