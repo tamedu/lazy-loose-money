@@ -169,11 +169,22 @@ contract Commitment {
     onlyOwner()
     {
         require(state != State.Closed);
-        // You loose half money
-        uint x = this.balance / 2;
-        uint y = this.balance - x;
-        guardian.transfer(y);
-        owner.transfer(x);
+        if (guardian == 0x0) {
+            /* You loose half money */
+            uint x = this.balance / 2;
+            uint y = this.balance - x;
+            0x0.transfer(y);
+            owner.transfer(x);
+            burned = burned + y;
+        } else {
+            /* You loose 2/3 money */
+            uint x = this.balance / 3;
+            uint y = this.balance - 2*x;
+            0x0.transfer(y);
+            guardian.transfer(x);
+            owner.transfer(x);
+            burned = burned + y;
+        }
         state = State.Closed;
         emit Closed(this, owner, daysCount, reportedDays, completedDays, x, y, now);
     }
@@ -183,8 +194,18 @@ contract Commitment {
     public
     {
         require(msg.sender == guardian || msg.sender == owner);
-        require(state >= State.Started && state != State.Closed);
-        require(now > finishedAt);
+        if (state < State.Started) {
+            /* If you too lazy to start, guardian get all money after 7 days */
+            require(now > guardedAt + 7 days);
+            reportedDays = 1;
+        } else {
+            require(state != State.Closed);
+            require(now > finishedAt);
+            if (reportedDays == 0) {
+                /* If guardian did not report at all, yoy get back your money */
+                completedDays = 1;
+            }
+        }
         uint x = this.balance / (completedDays + reportedDays);
         uint y = x * reportedDays;
         x = this.balance - y;
