@@ -10,7 +10,7 @@
         <div class="mw7 w-100 ph3 ph4-ns">
             <header>
                 <p class="pa2 black-70 bl bg-light-gray bw1 b--blue">
-                    Your account {{ address }} has {{ value }} ether(s).
+                    Your account <span class="black-50 f6">{{ address }}</span> has {{ Math.round(10000*value)/10000 }} ether(s).
                 </p>
             </header>
 
@@ -96,7 +96,18 @@ function getCurrentCommitmentContractInstant(func) {
             console.log(res);
             window.currentCommitment = commimentContract.at(res);
             if (func) func();
-        } // getCurrentCommitment
+        }
+    });
+}
+
+function updateAccountInfo() {
+    web3.eth.getBalance(web3.eth.defaultAccount, function(error, balance) {
+        if (!error) {
+            app.address = web3.eth.defaultAccount;
+            app.value = balance.toNumber() / web3.toWei(1, 'ether');
+        } else {
+            console.error(error);
+        }
     });
 }
 
@@ -111,17 +122,10 @@ window.addEventListener("load", function() {
     }
 
     web3.eth.getAccounts(function(error, accounts) {
-        if (!error) {
-            web3.eth.getBalance(web3.eth.defaultAccount, function(error, balance) {
-                if (!error) {
-                    app.address = web3.eth.defaultAccount;
-                    app.value = balance.toNumber() / web3.toWei(1, 'ether');
-                } else {
-                    console.error(error);
-                }
-            });
-        } else {
+        if (error) {
             console.error(error);
+        } else {
+            updateAccountInfo();
         }
     });
 
@@ -165,6 +169,7 @@ var app = new Vue({
               } else {
                   console.log(res);
                   app.commitment = {};
+                  updateAccountInfo();
               }
           });
 
@@ -189,6 +194,7 @@ var app = new Vue({
                       }
                       app.notification = "Here is your latest commitment sir!";
                       app.showCurrentCommitment = true;
+                      updateAccountInfo();
                   }
               });
 
@@ -202,6 +208,7 @@ var app = new Vue({
                   console.log(res);
                   app.currentCommitment = {};
                   app.showCurrentCommitment = false;
+                  updateAccountInfo();
               }
           });
       }
