@@ -7,7 +7,7 @@ contract LlmFactory {
     mapping(address => address) public currentCommitment; // current commitment contract address of msg.sender
 
     /* events to log */
-    event CommitmentCreated(address indexed owner, address commitment, string title, uint daysCount);
+    event CommitmentCreated(address indexed owner, address commitment, string title, uint daysCount, uint createdAt);
 
     function createCommitment(string _title, uint _days)
     public
@@ -26,7 +26,7 @@ contract LlmFactory {
         newCommitment = (new Commitment).value(msg.value)(msg.sender, _title, _days);
         commitments.push(newCommitment);
         currentCommitment[msg.sender] = newCommitment;
-        emit CommitmentCreated(msg.sender, newCommitment, _title, _days);
+        emit CommitmentCreated(msg.sender, newCommitment, _title, _days, now);
     }
 
     function getCurrentCommitmentAddress()
@@ -118,12 +118,12 @@ contract Commitment {
         createdAt = now;
         guardianDeposit = 2*(deposit / daysCount);
 
-        emit Created(this, owner, deposit, title, createdAt, daysCount);
+        emit Created(this, owner, deposit, title, daysCount, createdAt);
     }
 
     /* events to log */
-    event Created(address indexed commitment, address indexed owner, uint deposit, string title, uint createdAt, uint daysCount);
-    event fundAdded(address indexed commitment, address indexed supporter, uint value, string encouragement);
+    event Created(address indexed commitment, address indexed owner, uint deposit, string title, uint daysCount, uint createdAt);
+    event fundAdded(address indexed commitment, address indexed supporter, uint value, string encouragement, uint fundedAt);
     event Started(address indexed commitment, address indexed owner, uint startedAt, uint finishedAt);
     event Guarded(address indexed commitment, address indexed owner, address indexed guardian, uint guardianDeposit, uint guardedAt);
     event Reported(address indexed commitment, address indexed owner, address indexed guardian, bool completed, uint reportedAt);
@@ -171,17 +171,19 @@ contract Commitment {
     onlyOwner()
     {
         require(state != State.Closed);
+        uint x;
+        uint y;
         if (guardian == 0x0) {
             /* You loose half money */
-            uint x = this.balance / 2;
-            uint y = this.balance - x;
+            x = this.balance / 2;
+            y = this.balance - x;
             BURN_ADDRESS.transfer(y);
             owner.transfer(x);
             burned = burned + y;
         } else {
             /* You loose 2/3 money */
-            uint x = this.balance / 3;
-            uint y = this.balance - 2*x;
+            x = this.balance / 3;
+            y = this.balance - 2*x;
             BURN_ADDRESS.transfer(y);
             guardian.transfer(x);
             owner.transfer(x);
