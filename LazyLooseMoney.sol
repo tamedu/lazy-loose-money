@@ -47,6 +47,7 @@ contract LlmFactory {
 }
 
 contract Commitment {
+    address BURN_ADDRESS = 0x0;
     /* data structure */
     string public title;
     address public owner;
@@ -71,6 +72,7 @@ contract Commitment {
         Opened,
         Guarded,
         Started,
+        Pending,
         Closed
     }
     State state;
@@ -173,14 +175,14 @@ contract Commitment {
             /* You loose half money */
             uint x = this.balance / 2;
             uint y = this.balance - x;
-            0x0.transfer(y);
+            BURN_ADDRESS.transfer(y);
             owner.transfer(x);
             burned = burned + y;
         } else {
             /* You loose 2/3 money */
             uint x = this.balance / 3;
             uint y = this.balance - 2*x;
-            0x0.transfer(y);
+            BURN_ADDRESS.transfer(y);
             guardian.transfer(x);
             owner.transfer(x);
             burned = burned + y;
