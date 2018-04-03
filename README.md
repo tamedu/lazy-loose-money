@@ -23,6 +23,12 @@ Later, we can add more features:
 * I can blame the guardian (did not report correctly, ...) and both I him will loose money ...
 * More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my committent is.
 
+## More game theory
+To avoid troll guardian (not implemented yet):
+* Guardian need to deposit some money
+* committer can `complain` if guardian reported wrongly. In this case both committer and guardian loose money
+* After complain for 3 times, committer can `fire` his guardian to find a more realiable one
+
 ## Smart contract development and deployment
 Copy Solidity code from `LazyLooseMoney.sol` and paste it to http://remix.ethereum.org
 
