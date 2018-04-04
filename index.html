@@ -25,7 +25,8 @@
                 </div>
 
                 <article v-if="!llm.isGuarding()" class="mb2 mt3">
-                    <a  v-on:click="getCurrentCommitment"
+                    <a  v-if="!(currentCommitment && currentCommitment.state == null)"
+                        v-on:click="getCurrentCommitment"
                             href="#0" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
                         <span class="pl1">Current commitment</span>
                     </a>
@@ -156,12 +157,17 @@ var app = new Vue({
             app.showCreateCommitmentForm = false;
             app.notification = "Getting current commitment ...";
             llm.currentCommitment.getContractInstant(function () {
-                llm.currentCommitment.getInfo(function (currentCommitment) {
-                    app.currentCommitment = currentCommitment;
-                    app.notification = "Here is your latest commitment sir!";
-                    app.showCurrentCommitment = true;
-                    app.updateAccountInfo();
-                });
+                if (llm.currentCommitment.contractInstance.address == "0x0000000000000000000000000000000000000000") {
+                    app.notification = "There is no current commitment sir. Please create a new one!";
+                    app.currentCommitment = {};
+                } else {
+                    llm.currentCommitment.getInfo(function (currentCommitment) {
+                        app.currentCommitment = currentCommitment;
+                        app.notification = "Here is your latest commitment sir!";
+                        app.showCurrentCommitment = true;
+                        app.updateAccountInfo();
+                    });
+                }
             });
         },
         cancelCurrentCommitment() {
