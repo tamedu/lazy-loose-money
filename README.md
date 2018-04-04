@@ -32,6 +32,15 @@ To avoid troll guardian (not implemented yet):
 ## Smart contract development and deployment
 Copy Solidity code from `LazyLooseMoney.sol` and paste it to http://remix.ethereum.org
 
+## JavaScript CLI tools
+```
+# Open the HTML app in Chrome
+open https://tamedu.github.io/lazy-loose-money/
+# Press Ctrl + Shift + J (Windows / Linux) or Cmd + Opt + J (Mac)
+# to open Chrome DevTools Console
+llm.help()
+```
+
 ## References
 ### web3j3
 https://github.com/ethereum/wiki/wiki/JavaScript-API
@@ -44,7 +53,7 @@ https://github.com/cryptoprimitive/contracts/blob/master/BurnablePayment.sol
 
 Learn Factory pattern and burnable concept from the contract. Also learn how to struct my solidity code too :) Thanks [@coinop-logan](https://github.com/coinop-logan) to share the idea and introduce me to the blockchain world!
 
-### Vuejs: My Automatic View :)
+### Vuejs: My Automatic View ^_^
 https://vuejs.org/v2/guide/
 
 ### tachyons: styling your HTML without touching CSS code :)
