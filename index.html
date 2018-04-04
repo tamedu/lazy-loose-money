@@ -114,6 +114,7 @@ var app = new Vue({
         },
         newCommitment() {
             app.showCreateCommitmentForm = true;
+            app.showCurrentCommitment = false;
             app.notification = "Please enter details ...";
             window.setTimeout(function(){ app.notification = "Hurry up! I'm waiting ... " }, 3000);
         },
@@ -126,15 +127,16 @@ var app = new Vue({
             app.showCreateCommitmentForm = false;
         },
         getCurrentCommitment() {
-          app.notification = "Getting current commitment ...";
-          llm.currentCommitment.getContractInstant(function () {
-              llm.currentCommitment.getInfo(function (currentCommitment) {
-                  app.currentCommitment = currentCommitment;
-                  app.notification = "Here is your latest commitment sir!";
-                  app.showCurrentCommitment = true;
-                  app.updateAccountInfo();
-              });
-          });
+            app.showCreateCommitmentForm = false;
+            app.notification = "Getting current commitment ...";
+            llm.currentCommitment.getContractInstant(function () {
+                llm.currentCommitment.getInfo(function (currentCommitment) {
+                    app.currentCommitment = currentCommitment;
+                    app.notification = "Here is your latest commitment sir!";
+                    app.showCurrentCommitment = true;
+                    app.updateAccountInfo();
+                });
+            });
         },
         cancelCurrentCommitment() {
             llm.currentCommitment.cancel(function () {

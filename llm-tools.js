@@ -6,14 +6,14 @@
 (function () {
 
 // https://ethereum.stackexchange.com/questions/11444/web3-js-with-promisified-api
-const promisify = (inner) =>
+window.promisify = (inner) =>
     new Promise((resolve, reject) =>
         inner((err, res) => {
             if (err) { console.log(err); reject(err); }
             resolve(res);
         })
     );
-// await promisify(() => console.log('d'));
+// await window.promisify(() => console.log('hello')); // did not work! why?
 
 
 window.llm = {
@@ -188,12 +188,10 @@ window.llm.currentCommitment = {
             console.log("Run llm.currentCommitment.getContractInstant() first");
             return;
         }
-        console.log(this.contractInstance);
         this.contractInstance.getInfo(function (err, res) {
             if (err) {
                 console.log(err.message);
             } else {
-                console.log(res);
                 currentCommitment = {
                     title:  res[1],
                     deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
