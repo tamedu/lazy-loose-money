@@ -5,13 +5,14 @@
 
 llm = {
     help() {
-        console.log("\n[ General utilities ]")
-        console.log("llm.initWeb3();\nllm.initAccounts();\nllm.accountInfo();\nllm.createCommitment();");
-
-        console.log("\n[ currentCommitment utilities ]");
+        console.log(`
+[ General utilities ]
+    llm.initWeb3(); // Init window.web3, llm.factoryContractInstance, llm.commimentContract
+    llm.initAccounts(); // Need to run before call llm.accountInfo();
+    llm.accountInfo(); // Get default account address and it's balance
+    llm.createCommitment(data); // data = { title: '...', deposit: inWeiValue, daysCount: intValue }
+        `);
         llm.currentCommitment.help();
-
-        console.log("\n[ guardingCommitment utilities ]");
         llm.guardingCommitment.help();
     },
 
@@ -89,7 +90,13 @@ llm = {
 /* guardingCommitment utilities */
 llm.guardingCommitment = {
     help() {
-        console.log("llm.guardingCommitment.getContractAddress(); \nllm.guardingCommitment.getContractInstant();\nllm.guardingCommitment.getInfo();\nllm.guardingCommitment.report()");
+        console.log(`
+[ guardingCommitment utilities ]
+    llm.guardingCommitment.getContractAddress();
+    llm.guardingCommitment.getContractInstant();
+    llm.guardingCommitment.getInfo();
+    llm.guardingCommitment.report(completed); // Report today committer progress. completed = true or false
+        `);
     },
     /*
         Use https://tamedu.github.io/lazy-loose-money/?guardingCommitment=0xd282007af28c3f8e46fdef6cb3fdb91dfafc2911
@@ -124,7 +131,12 @@ llm.guardingCommitment = {
 /* currentCommitment utilities */
 llm.currentCommitment = {
     help() {
-        console.log("llm.currentCommitment.getContractInstant(); \nllm.currentCommitment.getInfo();\nllm.currentCommitment.cancel()");
+        console.log(`
+[ currentCommitment utilities ]
+    llm.currentCommitment.getContractInstant();
+    llm.currentCommitment.getInfo();
+    llm.currentCommitment.cancel();
+        `);
     },
     contractInstance: null,
     cancel(func) {
