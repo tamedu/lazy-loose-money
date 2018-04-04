@@ -3,7 +3,20 @@
     use with Mist/MetaMask injected web3
 */
 
-llm = {
+(function () {
+
+// https://ethereum.stackexchange.com/questions/11444/web3-js-with-promisified-api
+const promisify = (inner) =>
+    new Promise((resolve, reject) =>
+        inner((err, res) => {
+            if (err) { console.log(err); reject(err); }
+            resolve(res);
+        })
+    );
+// await promisify(() => console.log('d'));
+
+
+window.llm = {
     help() {
         console.log(`
 [ General utilities ]
@@ -12,8 +25,8 @@ llm = {
     llm.accountInfo(); // Get default account address and it's balance
     llm.createCommitment(data); // data = { title: '...', deposit: inWeiValue, daysCount: intValue }
         `);
-        llm.currentCommitment.help();
-        llm.guardingCommitment.help();
+        this.currentCommitment.help();
+        this.guardingCommitment.help();
     },
 
     /* general utilities */
@@ -25,13 +38,13 @@ llm = {
         } else {
           console.log("No web3? You should consider trying MetaMask!");
         }
-        llm.factoryContractInstance = web3.eth.contract(llm.abis.LlmFactory).at(llm.FactoryContractAddress);
-        llm.commimentContract = web3.eth.contract(llm.abis.Commitment);
+        this.factoryContractInstance = web3.eth.contract(this.abis.LlmFactory).at(this.FactoryContractAddress);
+        this.commimentContract = web3.eth.contract(this.abis.Commitment);
     },
 
     createCommitment(data, func) {
         var value = Math.round(parseFloat(data.deposit) * web3.toWei(1, 'ether'));
-        llm.factoryContractInstance.createCommitment(data.title,
+        this.factoryContractInstance.createCommitment(data.title,
             parseInt(data.daysCount), {'value': data.value }, function(err, res) {
         if (err) {
             console.log(err.message);
@@ -56,11 +69,13 @@ llm = {
     },
 
     initAccounts(func) {
+        // var accounts = await window.promisify(cb => web3.eth.getAccounts(cb));
+
         web3.eth.getAccounts(function(error, accounts) {
             if (error) {
                 console.error(error);
             } else {
-                console.log(accounts);
+                console.log('Accounts:', accounts);
                 if (func) { func(); }
             }
         });
@@ -88,7 +103,7 @@ llm = {
 };
 
 /* guardingCommitment utilities */
-llm.guardingCommitment = {
+window.llm.guardingCommitment = {
     help() {
         console.log(`
 [ guardingCommitment utilities ]
@@ -107,14 +122,14 @@ llm.guardingCommitment = {
         return window.location.href.match(/guardingCommitment=(0x([a-z0-9]){40})/)[1]
     },
     getContractInstant() {
-        this.contractInstance = llm.commimentContract.at(this.getContractAddress());
+        this.contractInstance = window.llm.commimentContract.at(this.getContractAddress());
         console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
         return this.contractInstance;
 },
     getInfo(func) {
-        llm.currentCommitment.contractInstance = llm.guardingCommitment.getContractInstant();
-        llm.currentCommitment.getInfo(func);
-        llm.currentCommitment.contractInstance = null;
+        window.llm.currentCommitment.contractInstance = window.llm.guardingCommitment.getContractInstant();
+        window.llm.currentCommitment.getInfo(func);
+        window.llm.currentCommitment.contractInstance = null;
     },
     report(completed, func) {
         llm.guardingCommitment.getContractInstant().report(completed, function (err, res) {
@@ -129,7 +144,7 @@ llm.guardingCommitment = {
 };
 
 /* currentCommitment utilities */
-llm.currentCommitment = {
+window.llm.currentCommitment = {
     help() {
         console.log(`
 [ currentCommitment utilities ]
@@ -155,14 +170,14 @@ llm.currentCommitment = {
 
     },
     getContractInstant(func) {
-        llm.factoryContractInstance.getCurrentCommitmentAddress(function(err, res) {
+        window.llm.factoryContractInstance.getCurrentCommitmentAddress(function(err, res) {
             if (err) {
                 console.log(err.message);
             } else {
                 console.log(res);
-                llm.currentCommitment.contractInstance = llm.commimentContract.at(res);
+                window.llm.currentCommitment.contractInstance = window.llm.commimentContract.at(res);
                 console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
-                if (func) { func(llm.currentCommitment.contractInstance); }
+                if (func) { func(window.llm.currentCommitment.contractInstance); }
                 return this.contractInstance;
             }
         });
@@ -183,7 +198,7 @@ llm.currentCommitment = {
                     title:  res[1],
                     deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
                     daysCount: res[4].toNumber(),
-                    state: llm.State[res[5].toNumber()],
+                    state: window.llm.State[res[5].toNumber()],
                 };
                 console.log("Current commitment: ", currentCommitment);
                 if (func) { func(currentCommitment); }
@@ -191,3 +206,5 @@ llm.currentCommitment = {
         });
     },
 };
+
+})();
