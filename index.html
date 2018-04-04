@@ -24,7 +24,7 @@
                   <span class="lh-title ml2 ml3-ns">{{ notification }}</span>
                 </div>
 
-                <article class="mb2 mt3">
+                <article v-if="!llm.isGuarding()" class="mb2 mt3">
                     <a  v-on:click="getCurrentCommitment"
                             href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2">
                         <span class="pl1">Current commitment</span>
@@ -38,6 +38,23 @@
                        v-on:click="cancelCurrentCommitment"
                             href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2 mt2">
                         <span class="pl1">Cancel commitment</span>
+                    </a>
+                </article>
+
+                <article v-if="llm.isGuarding()" class="mb2 mt3">
+                    <a  v-on:click=""
+                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2">
+                        <span class="pl1">Guarding commitment</span>
+                    </a>
+                    <a  v-if=""
+                        v-on:click=""
+                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2 mt2">
+                        <span class="pl1">Report success</span>
+                    </a>
+                    <a v-if=""
+                       v-on:click=""
+                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2 mt2">
+                        <span class="pl1">Report failure</span>
                     </a>
                 </article>
 

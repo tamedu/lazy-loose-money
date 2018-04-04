@@ -81,6 +81,10 @@ window.llm = {
         });
     },
 
+    isGuarding() {
+        return !!this.guardingCommitment.getContractAddress();
+    },
+
     /* data */
 
     State: [
