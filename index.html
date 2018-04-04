@@ -149,9 +149,17 @@ var app = new Vue({
 
 llm = {
     help() {
-        console.log("llm.initWeb3(); llm.initAccounts(); llm.accountInfo();");
+        console.log("\n[ General utilities ]")
+        console.log("llm.initWeb3();\nllm.initAccounts();\nllm.accountInfo();\nllm.createCommitment();");
+
+        console.log("\n[ currentCommitment utilities ]");
         llm.currentCommitment.help();
+
+        console.log("\n[ guardingCommitment utilities ]");
+        llm.guardingCommitment.help();
     },
+
+    /* general utilities */
     createCommitment(data, func) {
         var value = Math.round(parseFloat(data.deposit) * web3.toWei(1, 'ether'));
         llm.factoryContractInstance.createCommitment(data.title,
@@ -165,62 +173,6 @@ llm = {
       });
     },
 
-    currentCommitment: {
-        help() {
-            console.log("llm.currentCommitment.getContractInstant(); llm.currentCommitment.getInfo(); llm.currentCommitment.cancel()");
-        },
-        contractInstance: null,
-        cancel(func) {
-            if (this.contractInstance == null) {
-                console.log("Run llm.currentCommitment.getContractInstant() first");
-                return;
-            }
-            this.contractInstance.cancel(function (err, res) {
-                if (err) {
-                    console.log(err.message);
-                } else {
-                    console.log(res);
-                    if (func) { func(); }
-                }
-            });
-
-        },
-        getContractInstant(func) {
-            llm.factoryContractInstance.getCurrentCommitmentAddress(function(err, res) {
-                if (err) {
-                    console.log(err.message);
-                } else {
-                    console.log(res);
-                    llm.currentCommitment.contractInstance = llm.commimentContract.at(res);
-                    console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
-                    if (func) { func(llm.currentCommitment.contractInstance); }
-                }
-            });
-        },
-
-        getInfo(func) {
-            if (this.contractInstance == null) {
-                console.log("Run llm.currentCommitment.getContractInstant() first");
-                return;
-            }
-            console.log(this.contractInstance);
-            this.contractInstance.getInfo(function (err, res) {
-                if (err) {
-                    console.log(err.message);
-                } else {
-                    console.log(res);
-                    currentCommitment = {
-                        title:  res[1],
-                        deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
-                        daysCount: res[4].toNumber(),
-                        state: res[5].toNumber(),
-                    }
-                    console.log("Current commitment: ", currentCommitment);
-                    if (func) { func(currentCommitment); }
-                }
-            });
-        },
-    },
     accountInfo(func) {
         var accountAddress = web3.eth.defaultAccount;
         web3.eth.getBalance(accountAddress, function(error, balance) {
@@ -257,6 +209,8 @@ llm = {
         });
     },
 
+    /* data */
+
     State: [
         'Opened',
         'Guarded',
@@ -274,7 +228,103 @@ llm = {
         // ======= contracts/LazyLooseMoney.sol:LlmFactory =======
         LlmFactory: [{"constant":false,"inputs":[{"name":"_title","type":"string"},{"name":"_days","type":"uint256"}],"name":"createCommitment","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"commitments","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getCurrentCommitmentAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getLastCommitmentAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"commitment","type":"address"},{"indexed":false,"name":"title","type":"string"},{"indexed":false,"name":"daysCount","type":"uint256"}],"name":"CommitmentCreated","type":"event"}],
     }
-}
+};
+
+/* guardingCommitment utilities */
+llm.guardingCommitment = {
+    help() {
+        console.log("llm.guardingCommitment.getContractAddress(); \nllm.guardingCommitment.getContractInstant();\nllm.guardingCommitment.getInfo();\nllm.guardingCommitment.report()");
+    },
+    contractInstance: null,
+    /*
+        Use https://tamedu.github.io/lazy-loose-money/?guardingCommitment=0xd282007af28c3f8e46fdef6cb3fdb91dfafc2911
+        to access the commitment you want to be guardian and to report committer daily progress
+        the contract address is stored in `guardingCommitment` GET parameter
+    */
+    getContractAddress() {
+        return window.location.href.match(/guardingCommitment=(0x([a-z0-9]){40})/)[1]
+    },
+    getContractInstant() {
+        this.contractInstance = llm.commimentContract.at(this.getContractAddress());
+    },
+    getInfo(func) {
+        if (this.contractInstance == null) {
+            console.log("Run llm.guardingCommitment.getContractInstant() first");
+            return;
+        }
+        llm.currentCommitment.contractInstance = this.contractInstance;
+        llm.currentCommitment.getInfo(func);
+        llm.currentCommitment.contractInstance = null;
+    },
+    report(completed, func) {
+        this.contractInstance.report(completed, function (err, res) {
+            if (err) {
+                console.log(err.message);
+            } else {
+                console.log(res);
+                if (func) { func(); }
+            }
+        });
+    },
+};
+
+/* currentCommitment utilities */
+llm.currentCommitment = {
+    help() {
+        console.log("llm.currentCommitment.getContractInstant(); \nllm.currentCommitment.getInfo();\nllm.currentCommitment.cancel()");
+    },
+    contractInstance: null,
+    cancel(func) {
+        if (this.contractInstance == null) {
+            console.log("Run llm.currentCommitment.getContractInstant() first");
+            return;
+        }
+        this.contractInstance.cancel(function (err, res) {
+            if (err) {
+                console.log(err.message);
+            } else {
+                console.log(res);
+                if (func) { func(); }
+            }
+        });
+
+    },
+    getContractInstant(func) {
+        llm.factoryContractInstance.getCurrentCommitmentAddress(function(err, res) {
+            if (err) {
+                console.log(err.message);
+            } else {
+                console.log(res);
+                llm.currentCommitment.contractInstance = llm.commimentContract.at(res);
+                console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
+                if (func) { func(llm.currentCommitment.contractInstance); }
+            }
+        });
+    },
+
+    getInfo(func) {
+        if (this.contractInstance == null) {
+            console.log("Run llm.currentCommitment.getContractInstant() first");
+            return;
+        }
+        console.log(this.contractInstance);
+        this.contractInstance.getInfo(function (err, res) {
+            if (err) {
+                console.log(err.message);
+            } else {
+                console.log(res);
+                currentCommitment = {
+                    title:  res[1],
+                    deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
+                    daysCount: res[4].toNumber(),
+                    state: res[5].toNumber(),
+                }
+                console.log("Current commitment: ", currentCommitment);
+                if (func) { func(currentCommitment); }
+            }
+        });
+    },
+};
 
 </script>
 </html>
