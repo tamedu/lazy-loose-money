@@ -26,19 +26,19 @@
 
                 <article v-if="!llm.isGuarding()" class="mb2 mt3">
                     <a  v-on:click="getCurrentCommitment"
-                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2">
+                            href="#0" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
                         <span class="pl1">Current commitment</span>
                     </a>
                     <a  v-if="currentCommitment && (currentCommitment.state == null || currentCommitment.state=='Closed')"
                         v-on:click="newCommitment"
-                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2 mt2">
+                            href="#0" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black mt2">
                         <span class="pl1">New commitment</span>
                     </a>
                 </article>
                 <article v-if="llm.isGuarding()" class="mb2 mt3">
-                    <a  v-on:click=""
-                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2">
-                        <span class="pl1">Guarding commitment</span>
+                    <a  v-on:click="getGuardingCommitment"
+                            href="#0" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
+                        <span class="pl1">Get guarding commitment</span>
                     </a>
                 </article>
 
@@ -61,12 +61,12 @@
                     <div v-if="llm.isGuarding()" class="pa3">
                         <a  v-if=""
                             v-on:click=""
-                                href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2 mt2">
+                                href="#0" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-blue">
                             <span class="pl1">Report success</span>
                         </a>
                         <a v-if=""
                            v-on:click=""
-                                href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr2 mt2">
+                                href="#0" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-green">
                             <span class="pl1">Report failure</span>
                         </a>
                     </div>
@@ -129,6 +129,13 @@ var app = new Vue({
             llm.accountInfo(function (accountAddress, balance) {
                 app.address = accountAddress;
                 app.value = balance;
+            });
+        },
+        getGuardingCommitment() {
+            llm.guardingCommitment.getInfo(function () {
+                app.currentCommitment = currentCommitment;
+                app.notification = "Here is your guarding commitment sir!";
+                app.showCurrentCommitment = true;
             });
         },
         newCommitment() {
