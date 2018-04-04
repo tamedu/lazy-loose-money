@@ -29,12 +29,12 @@
                             href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
                         <span class="pl1">Get current commitment</span>
                     </a>
-                    <a  v-if="currentCommitment.state == null || llm.State[currentCommitment.state]=='Closed'"
+                    <a  v-if="currentCommitment.state == null || currentCommitment.state=='Closed'"
                         v-on:click="newCommitment"
                             href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
                         <span class="pl1">New commitment</span>
                     </a>
-                    <a v-if="currentCommitment.state != null && llm.State[currentCommitment.state]!='Closed'"
+                    <a v-if="currentCommitment.state != null && currentCommitment.state!='Closed'"
                        v-on:click="cancelCurrentCommitment"
                             href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
                         <span class="pl1">Cancel current commitment</span>
@@ -48,7 +48,7 @@
                     <div class="pa3">
                         <p>You deposited {{ currentCommitment.deposit }} ether(s).</p>
                         <p>You plan to finish your goal in {{ currentCommitment.daysCount }} day(s).</p>
-                        <small class="gray db pv2"><time>Currently it is {{ llm.State[currentCommitment.state] }}</time></small>
+                        <small class="gray db pv2"><time>Currently it is {{ currentCommitment.state }}</time></small>
                     </div>
                 </article>
 
@@ -235,7 +235,6 @@ llm.guardingCommitment = {
     help() {
         console.log("llm.guardingCommitment.getContractAddress(); \nllm.guardingCommitment.getContractInstant();\nllm.guardingCommitment.getInfo();\nllm.guardingCommitment.report()");
     },
-    contractInstance: null,
     /*
         Use https://tamedu.github.io/lazy-loose-money/?guardingCommitment=0xd282007af28c3f8e46fdef6cb3fdb91dfafc2911
         to access the commitment you want to be guardian and to report committer daily progress
@@ -246,18 +245,16 @@ llm.guardingCommitment = {
     },
     getContractInstant() {
         this.contractInstance = llm.commimentContract.at(this.getContractAddress());
-    },
+        console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
+        return this.contractInstance;
+},
     getInfo(func) {
-        if (this.contractInstance == null) {
-            console.log("Run llm.guardingCommitment.getContractInstant() first");
-            return;
-        }
-        llm.currentCommitment.contractInstance = this.contractInstance;
+        llm.currentCommitment.contractInstance = llm.guardingCommitment.getContractInstant();
         llm.currentCommitment.getInfo(func);
         llm.currentCommitment.contractInstance = null;
     },
     report(completed, func) {
-        this.contractInstance.report(completed, function (err, res) {
+        llm.guardingCommitment.getContractInstant().report(completed, function (err, res) {
             if (err) {
                 console.log(err.message);
             } else {
@@ -298,6 +295,7 @@ llm.currentCommitment = {
                 llm.currentCommitment.contractInstance = llm.commimentContract.at(res);
                 console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
                 if (func) { func(llm.currentCommitment.contractInstance); }
+                return this.contractInstance;
             }
         });
     },
@@ -317,8 +315,8 @@ llm.currentCommitment = {
                     title:  res[1],
                     deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
                     daysCount: res[4].toNumber(),
-                    state: res[5].toNumber(),
-                }
+                    state: llm.State[res[5].toNumber()],
+                };
                 console.log("Current commitment: ", currentCommitment);
                 if (func) { func(currentCommitment); }
             }
