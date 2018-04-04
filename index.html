@@ -23,18 +23,18 @@
                   <span class="lh-title ml3">{{ notification }}</span>
                 </div>
 
-                <article v-if="!showCreateCommitmentForm">
-                    <a  v-if="currentCommitment.state == null || State[currentCommitment.state]=='Closed'"
-                        v-on:click="newCommitment"
-                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
-                        <span class="pl1">New commitment</span>
-                    </a>
+                <article>
                     <a  v-if="!showCurrentCommitment"
                         v-on:click="getCurrentCommitment"
                             href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
                         <span class="pl1">Get current commitment</span>
                     </a>
-                    <a v-if="currentCommitment.state != null && State[currentCommitment.state]!='Closed'"
+                    <a  v-if="currentCommitment.state == null || llm.State[currentCommitment.state]=='Closed'"
+                        v-on:click="newCommitment"
+                            href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
+                        <span class="pl1">New commitment</span>
+                    </a>
+                    <a v-if="currentCommitment.state != null && llm.State[currentCommitment.state]!='Closed'"
                        v-on:click="cancelCurrentCommitment"
                             href="#0" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa2 ba border-box mr4">
                         <span class="pl1">Cancel current commitment</span>
@@ -48,7 +48,7 @@
                     <div class="pa3">
                         <p>You deposited {{ currentCommitment.deposit }} ether(s).</p>
                         <p>You plan to finish your goal in {{ currentCommitment.daysCount }} day(s).</p>
-                        <small class="gray db pv2"><time>Currently it is {{ State[currentCommitment.state] }}</time></small>
+                        <small class="gray db pv2"><time>Currently it is {{ llm.State[currentCommitment.state] }}</time></small>
                     </div>
                 </article>
 
@@ -84,63 +84,12 @@
 </body>
 
 <script>
-
-// https://ropsten.etherscan.io/address/0xabc89d6e0569f9ee41d3a716b66b956d189d084a
-var LlmFactoryContractAddress = '0x8fe47d910ea6efc197ba4d6b12f8b352995abf5d';
-
-function getCurrentCommitmentContractInstant(func) {
-    llmFactory.getCurrentCommitmentAddress(function(err, res) {
-        if (err) {
-            console.log(err.message);
-        } else {
-            console.log(res);
-            window.currentCommitment = commimentContract.at(res);
-            if (func) func();
-        }
-    });
-}
-
-function updateAccountInfo() {
-    web3.eth.getBalance(web3.eth.defaultAccount, function(error, balance) {
-        if (!error) {
-            app.address = web3.eth.defaultAccount;
-            app.value = balance.toNumber() / web3.toWei(1, 'ether');
-        } else {
-            console.error(error);
-        }
-    });
-}
-
-// https://codepen.io/k3no/pen/MEzvrV
 window.addEventListener("load", function() {
-    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
-    if (typeof web3 !== "undefined") {
-      // Use Mist/MetaMask's provider
-      window.web3 = new Web3(web3.currentProvider);
-    } else {
-      console.log("No web3? You should consider trying MetaMask!");
-    }
-
-    web3.eth.getAccounts(function(error, accounts) {
-        if (error) {
-            console.error(error);
-        } else {
-            updateAccountInfo();
-        }
+    llm.initWeb3();
+    llm.initAccounts(function () {
+        app.updateAccountInfo();
     });
-
-    window.llmFactory = web3.eth.contract(LlmFactoryAbi).at(LlmFactoryContractAddress);
-    window.commimentContract = web3.eth.contract(CommitmentAbi);
 });
-
-
-var State = [
-    'Opened',
-    'Guarded',
-    'Started',
-    'Pending',
-    'Closed'
-];
 
 var app = new Vue({
     el: '#app',
@@ -154,73 +103,175 @@ var app = new Vue({
         notification: "Waiting for your command sir!",
     },
     methods: {
-      newCommitment() {
-          app.showCurrentCommitment = false;
-          app.showCreateCommitmentForm = true;
-          app.notification = "Please enter details ...";
-          window.setTimeout(function(){ app.notification = "Hurry up! I'm waiting ... " }, 3000);
-      },
-      createCommitment() {
-          var value = Math.round(parseFloat(app.commitment.deposit) * web3.toWei(1, 'ether'));
-          llmFactory.createCommitment(app.commitment.title,
-                parseInt(app.commitment.daysCount), {'value': value }, function(err, res) {
-              if (err) {
-                  console.log(err.message);
-              } else {
-                  console.log(res);
-                  app.commitment = {};
-                  updateAccountInfo();
-              }
-          });
-
-          app.currentCommitment = {};
-          app.showCreateCommitmentForm = false;
-
-      },
-      getCurrentCommitment() {
+        updateAccountInfo() {
+            llm.accountInfo(function (accountAddress, balance) {
+                app.address = accountAddress;
+                app.value = balance;
+            });
+        },
+        newCommitment() {
+            app.showCreateCommitmentForm = true;
+            app.notification = "Please enter details ...";
+            window.setTimeout(function(){ app.notification = "Hurry up! I'm waiting ... " }, 3000);
+        },
+        createCommitment() {
+            llm.createCommitment(app.commitment, function () {
+                app.commitment = {};
+                app.updateAccountInfo();
+            });
+            app.currentCommitment = {};
+            app.showCreateCommitmentForm = false;
+        },
+        getCurrentCommitment() {
           app.notification = "Getting current commitment ...";
-          getCurrentCommitmentContractInstant(function () {
-
-              currentCommitment.getInfo(function (err, res) {
-                  if (err) {
-                      console.log(err.message);
-                  } else {
-                      console.log(res);
-                      app.currentCommitment = {
-                          title:  res[1],
-                          deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
-                          daysCount: res[4].toNumber(),
-                          state: res[5].toNumber(),
-                      }
-                      app.notification = "Here is your latest commitment sir!";
-                      app.showCurrentCommitment = true;
-                      updateAccountInfo();
-                  }
+          llm.currentCommitment.getContractInstant(function () {
+              llm.currentCommitment.getInfo(function (currentCommitment) {
+                  app.currentCommitment = currentCommitment;
+                  app.notification = "Here is your latest commitment sir!";
+                  app.showCurrentCommitment = true;
+                  app.updateAccountInfo();
               });
-
           });
-      },
-      cancelCurrentCommitment() {
-          currentCommitment.cancel(function (err, res) {
-              if (err) {
-                  console.log(err.message);
-              } else {
-                  console.log(res);
-                  app.currentCommitment = {};
-                  app.showCurrentCommitment = false;
-                  updateAccountInfo();
-              }
-          });
-      }
+        },
+        cancelCurrentCommitment() {
+            llm.currentCommitment.cancel(function () {
+                app.currentCommitment = {};
+                app.updateAccountInfo();
+            });
+            app.showCurrentCommitment = true;
+        }
     }
 })
 
-/* run `solc --abi contracts/LazyLooseMoney.sol` to get the ABI jsons */
-// ======= contracts/LazyLooseMoney.sol:Commitment =======
-var CommitmentAbi = [{"constant":false,"inputs":[{"name":"encouragement","type":"string"}],"name":"supportFund","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"commit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"cancel","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"guardian","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"title","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getInfo","outputs":[{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint8"},{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"release","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"beGuardian","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"completed","type":"bool"}],"name":"report","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"supportersFunded","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_creator","type":"address"},{"name":"_title","type":"string"},{"name":"_days","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"deposit","type":"uint256"},{"indexed":false,"name":"title","type":"string"},{"indexed":false,"name":"createdAt","type":"uint256"},{"indexed":false,"name":"daysCount","type":"uint256"}],"name":"Created","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"supporter","type":"address"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"encouragement","type":"string"}],"name":"fundAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"startedAt","type":"uint256"},{"indexed":false,"name":"finishedAt","type":"uint256"}],"name":"Started","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"guardian","type":"address"},{"indexed":false,"name":"guardianDeposit","type":"uint256"},{"indexed":false,"name":"guardedAt","type":"uint256"}],"name":"Guarded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"guardian","type":"address"},{"indexed":false,"name":"completed","type":"bool"},{"indexed":false,"name":"reportedAt","type":"uint256"}],"name":"Reported","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"dayscount","type":"uint256"},{"indexed":false,"name":"reportedDays","type":"uint256"},{"indexed":false,"name":"completedDays","type":"uint256"},{"indexed":false,"name":"ownerReward","type":"uint256"},{"indexed":false,"name":"guardianReward","type":"uint256"},{"indexed":false,"name":"closedAt","type":"uint256"}],"name":"Closed","type":"event"}]
 
-// ======= contracts/LazyLooseMoney.sol:LlmFactory =======
-var LlmFactoryAbi = [{"constant":false,"inputs":[{"name":"_title","type":"string"},{"name":"_days","type":"uint256"}],"name":"createCommitment","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"commitments","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getCurrentCommitmentAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getLastCommitmentAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"commitment","type":"address"},{"indexed":false,"name":"title","type":"string"},{"indexed":false,"name":"daysCount","type":"uint256"}],"name":"CommitmentCreated","type":"event"}]
+llm = {
+    help() {
+        console.log("llm.initWeb3(); llm.initAccounts(); llm.accountInfo();");
+        llm.currentCommitment.help();
+    },
+    createCommitment(data, func) {
+        var value = Math.round(parseFloat(data.deposit) * web3.toWei(1, 'ether'));
+        llm.factoryContractInstance.createCommitment(data.title,
+            parseInt(data.daysCount), {'value': data.value }, function(err, res) {
+        if (err) {
+            console.log(err.message);
+        } else {
+            console.log(res);
+            if (func) { func(); }
+          }
+      });
+    },
+
+    currentCommitment: {
+        help() {
+            console.log("llm.currentCommitment.getContractInstant(); llm.currentCommitment.getInfo(); llm.currentCommitment.cancel()");
+        },
+        contractInstance: null,
+        cancel(func) {
+            if (this.contractInstance == null) {
+                console.log("Run llm.currentCommitment.getContractInstant() first");
+                return;
+            }
+            this.contractInstance.cancel(function (err, res) {
+                if (err) {
+                    console.log(err.message);
+                } else {
+                    console.log(res);
+                    if (func) { func(); }
+                }
+            });
+
+        },
+        getContractInstant(func) {
+            llm.factoryContractInstance.getCurrentCommitmentAddress(function(err, res) {
+                if (err) {
+                    console.log(err.message);
+                } else {
+                    console.log(res);
+                    llm.currentCommitment.contractInstance = llm.commimentContract.at(res);
+                    console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
+                    if (func) { func(llm.currentCommitment.contractInstance); }
+                }
+            });
+        },
+
+        getInfo(func) {
+            if (this.contractInstance == null) {
+                console.log("Run llm.currentCommitment.getContractInstant() first");
+                return;
+            }
+            console.log(this.contractInstance);
+            this.contractInstance.getInfo(function (err, res) {
+                if (err) {
+                    console.log(err.message);
+                } else {
+                    console.log(res);
+                    currentCommitment = {
+                        title:  res[1],
+                        deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
+                        daysCount: res[4].toNumber(),
+                        state: res[5].toNumber(),
+                    }
+                    console.log("Current commitment: ", currentCommitment);
+                    if (func) { func(currentCommitment); }
+                }
+            });
+        },
+    },
+    accountInfo(func) {
+        var accountAddress = web3.eth.defaultAccount;
+        web3.eth.getBalance(accountAddress, function(error, balance) {
+            if (error) {
+                console.error(error);
+            } else {
+                var balanceInEthers = balance.toNumber() / web3.toWei(1, 'ether');
+                console.log("Acccount " + accountAddress + " has " + balanceInEthers);
+                if (func) { func(accountAddress, balanceInEthers); }
+            }
+        });
+    },
+
+    initWeb3() {
+        // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+        if (typeof web3 !== "undefined") {
+          // Use Mist/MetaMask's provider
+          window.web3 = new Web3(web3.currentProvider);
+        } else {
+          console.log("No web3? You should consider trying MetaMask!");
+        }
+        llm.factoryContractInstance = web3.eth.contract(llm.abis.LlmFactory).at(llm.FactoryContractAddress);
+        llm.commimentContract = web3.eth.contract(llm.abis.Commitment);
+    },
+
+    initAccounts(func) {
+        web3.eth.getAccounts(function(error, accounts) {
+            if (error) {
+                console.error(error);
+            } else {
+                console.log(accounts);
+                if (func) { func(); }
+            }
+        });
+    },
+
+    State: [
+        'Opened',
+        'Guarded',
+        'Started',
+        'Pending',
+        'Closed'
+    ],
+    // https://ropsten.etherscan.io/address/0xabc89d6e0569f9ee41d3a716b66b956d189d084a
+    FactoryContractAddress: '0xabc89d6e0569f9ee41d3a716b66b956d189d084a',
+    /* run `solc --abi contracts/LazyLooseMoney.sol` to get the ABI jsons */
+    abis: {
+        // ======= contracts/LazyLooseMoney.sol:Commitment =======
+        Commitment: [{"constant":false,"inputs":[{"name":"encouragement","type":"string"}],"name":"supportFund","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"commit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"cancel","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"guardian","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"title","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getInfo","outputs":[{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint8"},{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"release","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"beGuardian","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"completed","type":"bool"}],"name":"report","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"supportersFunded","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_creator","type":"address"},{"name":"_title","type":"string"},{"name":"_days","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"deposit","type":"uint256"},{"indexed":false,"name":"title","type":"string"},{"indexed":false,"name":"createdAt","type":"uint256"},{"indexed":false,"name":"daysCount","type":"uint256"}],"name":"Created","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"supporter","type":"address"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"encouragement","type":"string"}],"name":"fundAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"startedAt","type":"uint256"},{"indexed":false,"name":"finishedAt","type":"uint256"}],"name":"Started","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"guardian","type":"address"},{"indexed":false,"name":"guardianDeposit","type":"uint256"},{"indexed":false,"name":"guardedAt","type":"uint256"}],"name":"Guarded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"guardian","type":"address"},{"indexed":false,"name":"completed","type":"bool"},{"indexed":false,"name":"reportedAt","type":"uint256"}],"name":"Reported","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"commitment","type":"address"},{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"dayscount","type":"uint256"},{"indexed":false,"name":"reportedDays","type":"uint256"},{"indexed":false,"name":"completedDays","type":"uint256"},{"indexed":false,"name":"ownerReward","type":"uint256"},{"indexed":false,"name":"guardianReward","type":"uint256"},{"indexed":false,"name":"closedAt","type":"uint256"}],"name":"Closed","type":"event"}],
+
+        // ======= contracts/LazyLooseMoney.sol:LlmFactory =======
+        LlmFactory: [{"constant":false,"inputs":[{"name":"_title","type":"string"},{"name":"_days","type":"uint256"}],"name":"createCommitment","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"commitments","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getCurrentCommitmentAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getLastCommitmentAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":false,"name":"commitment","type":"address"},{"indexed":false,"name":"title","type":"string"},{"indexed":false,"name":"daysCount","type":"uint256"}],"name":"CommitmentCreated","type":"event"}],
+    }
+}
 
 </script>
 </html>
