@@ -42,10 +42,10 @@ llm.help()
 ```
 
 ## References
-### web3j3
+### Web3js (the version injected by Mist/MetaMask)
 https://github.com/ethereum/wiki/wiki/JavaScript-API
 
-### solidity programming language
+### Solidity programming language
 https://solidity.readthedocs.io/en/v0.4.21/
 
 ### BurnablePayment solidity contract
