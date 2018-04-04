@@ -84,6 +84,7 @@
 </body>
 
 <script>
+/* init on load */
 window.addEventListener("load", function() {
     llm.initWeb3();
     llm.initAccounts(function () {
@@ -91,6 +92,7 @@ window.addEventListener("load", function() {
     });
 });
 
+/* the Vue app */
 var app = new Vue({
     el: '#app',
     data: {
@@ -141,8 +143,9 @@ var app = new Vue({
             app.showCurrentCommitment = true;
         }
     }
-})
+});
 
+/* llm utility functions */
 
 llm = {
     help() {
