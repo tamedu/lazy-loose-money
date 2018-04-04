@@ -39,6 +39,12 @@ open https://tamedu.github.io/lazy-loose-money/
 # Press Ctrl + Shift + J (Windows / Linux) or Cmd + Opt + J (Mac)
 # to open Chrome DevTools Console
 llm.help()
+
+# To interact with guardingCommitment (toBeGuardian, to report etc ..)
+open https://tamedu.github.io/lazy-loose-money/?guardingCommitment=0xd282007af28c3f8e46fdef6cb3fdb91dfafc2911
+# Press Ctrl + Shift + J (Windows / Linux) or Cmd + Opt + J (Mac)
+# to open Chrome DevTools Console
+llm.guardingCommitment.help()
 ```
 
 ## References
