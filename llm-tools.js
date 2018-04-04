@@ -123,7 +123,8 @@ window.llm.guardingCommitment = {
         the contract address is stored in `guardingCommitment` GET parameter
     */
     getContractAddress() {
-        return window.location.href.match(/guardingCommitment=(0x([a-z0-9]){40})/)[1]
+        var m = window.location.href.match(/guardingCommitment=(0x([a-z0-9]){40})/);
+        if (m) { return m[1]; }
     },
     getContractInstant() {
         this.contractInstance = window.llm.commimentContract.at(this.getContractAddress());
@@ -178,7 +179,7 @@ window.llm.currentCommitment = {
             if (err) {
                 console.log(err.message);
             } else {
-                console.log(res);
+                console.log('Current commitment address:', res);
                 window.llm.currentCommitment.contractInstance = window.llm.commimentContract.at(res);
                 console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
                 if (func) { func(window.llm.currentCommitment.contractInstance); }
