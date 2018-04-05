@@ -135,7 +135,7 @@ var app = new Vue({
             llm.guardingCommitment.report(false, function () {
 
             });
-        }
+        },
         updateAccountInfo() {
             llm.accountInfo(function (accountAddress, balance) {
                 app.address = accountAddress;
