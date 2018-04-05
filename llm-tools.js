@@ -113,12 +113,10 @@ window.llm.guardingCommitment = {
         if (m) { return m[1]; }
     },
     getContractInstant() {
-        this.contractInstance = window.llm.commimentContract.at(this.getContractAddress());
-        console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
-        return this.contractInstance;
+        return window.llm.commimentContract.at(this.getContractAddress());
 },
     getInfo(func) {
-        window.llm.currentCommitment.contractInstance = window.llm.guardingCommitment.getContractInstant();
+        window.llm.currentCommitment.contractInstance = this.getContractInstant();
         window.llm.currentCommitment.getInfo(function () {
             window.llm.currentCommitment.contractInstance = null;
             if (func) { func(); }
@@ -189,7 +187,10 @@ window.llm.currentCommitment = {
                 window.llm.currentCommitment.contractInstance = window.llm.commimentContract.at(res);
                 console.log("Current commitment contract instant assigned to llm.currentCommitment.contractInstance");
                 if (func) { func(window.llm.currentCommitment.contractInstance); }
-                return this.contractInstance;
+                var events = window.llm.currentCommitment.contractInstance.allEvents({fromBlock: 0, toBlock: 'latest'});
+                events.get(function(err, logs) {
+                  if (!err) { console.log("All events:", logs); }
+                });
             }
         });
     },
@@ -213,14 +214,13 @@ window.llm.currentCommitment = {
                     startedAt: new Date(res[6].toNumber()*1000),
                     finishedAt: new Date(res[7].toNumber()*1000),
                 };
-
-                var events = llm.currentCommitment.contractInstance.Reported({fromBlock: 0, toBlock: 'latest'});
-                // would get all past logs again.
+                // https://github.com/ethereum/wiki/wiki/JavaScript-API#contract-events
+                var events = window.llm.currentCommitment.contractInstance.Reported({fromBlock: 0, toBlock: 'latest'});
                 events.get(function(err, logs) {
                     if (err) {
                         console.log(err.message);
                     } else {
-                        console.log(logs);
+                        console.log("Reported events:", logs);
                         // currentCommitment.reports = logs;
                     }
                 });
