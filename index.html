@@ -41,6 +41,10 @@
                             href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
                         <span class="pl1">Get guarding commitment</span>
                     </a>
+                    <a  v-on:click="becomeGuardian"
+                            href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
+                        <span class="pl1">Become guardian</span>
+                    </a>
                 </article>
 
                 <article v-if='showCurrentCommitment' class="mw6 bg-white ba b--black-10">
@@ -50,6 +54,7 @@
                     <div class="pa3">
                         <p>You deposited {{ currentCommitment.deposit }} ether(s).</p>
                         <p>You plan to finish your goal in {{ currentCommitment.daysCount }} day(s).</p>
+                        <p v-if="currentCommitment.guardian">Your guardian {{ currentCommitment.guardian }}.</p>
                         <small class="gray db pv2"><time>Currently it is {{ currentCommitment.state }}</time></small>
                     </div>
                     <div v-if="!llm.isGuarding()" class="pa3">
@@ -135,6 +140,9 @@ var app = new Vue({
             llm.guardingCommitment.report(false, function () {
 
             });
+        },
+        becomeGuardian() {
+            llm.guardingCommitment.beGuardian(currentCommitment);
         },
         updateAccountInfo() {
             llm.accountInfo(function (accountAddress, balance) {

@@ -118,11 +118,25 @@ window.llm.guardingCommitment = {
 },
     getInfo(func) {
         window.llm.currentCommitment.contractInstance = window.llm.guardingCommitment.getContractInstant();
-        window.llm.currentCommitment.getInfo(func);
-        window.llm.currentCommitment.contractInstance = null;
+        window.llm.currentCommitment.getInfo(function () {
+            window.llm.currentCommitment.contractInstance = null;
+            if (func) { func(); }
+        });
     },
     report(completed, func) {
-        llm.guardingCommitment.getContractInstant().report(completed, function (err, res) {
+        this.getContractInstant().report(completed, function (err, res) {
+            if (err) {
+                console.log(err.message);
+            } else {
+                console.log(res);
+                if (func) { func(); }
+            }
+        });
+    },
+    beGuardian(data, func) {
+        data.value = Math.round(parseFloat(data.guardianDeposit) * web3.toWei(1, 'ether'));
+        console.log('Become guardian of: ', data);
+        this.getContractInstant().beGuardian({'value': data.value }, function(err, res) {
             if (err) {
                 console.log(err.message);
             } else {
@@ -185,10 +199,23 @@ window.llm.currentCommitment = {
                 currentCommitment = {
                     title:  res[1],
                     deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
+                    guardianDeposit: res[3].toNumber() / web3.toWei(1, 'ether'),
                     daysCount: res[4].toNumber(),
                     state: window.llm.State[res[5].toNumber()],
                     guardian: res[8],
                 };
+
+                var events = llm.currentCommitment.contractInstance.Reported({fromBlock: 0, toBlock: 'latest'});
+                // would get all past logs again.
+                events.get(function(err, logs) {
+                    if (err) {
+                        console.log(err.message);
+                    } else {
+                        console.log(logs);
+                        currentCommitment.reports = logs;
+                    }
+                });
+
                 console.log("Current commitment: ", currentCommitment);
                 if (func) { func(currentCommitment); }
             }
