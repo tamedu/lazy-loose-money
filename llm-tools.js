@@ -204,7 +204,9 @@ window.llm.currentCommitment = {
             if (err) {
                 console.log(err.message);
             } else {
+                if (res[8] == '0x0000000000000000000000000000000000000000') res[8] = null;
                 currentCommitment = {
+                    contractAddress: llm.currentCommitment.contractInstance.address,
                     title:  res[1],
                     deposit: res[2].toNumber() / web3.toWei(1, 'ether'),
                     guardianDeposit: res[3].toNumber() / web3.toWei(1, 'ether'),

@@ -52,9 +52,14 @@
                     <div class="pa3">
                         <p>Deposited {{ currentCommitment.deposit }} ether(s)</p>
                         <p>Planned to finish in {{ currentCommitment.daysCount }} day(s)</p>
-                        <p>Started at {{ moment(currentCommitment.startedAt).format('MMMM Do YYYY') }}</p>
-                        <p>To be finished at {{ moment(currentCommitment.finishedAt).format('MMMM Do YYYY') }}</p>
-                        <p v-if="currentCommitment.guardian">Guardian <span class="black-50 f6">{{ currentCommitment.guardian }}</span></p>
+                        <p v-if="currentCommitment.guardian">Started at {{ moment(currentCommitment.startedAt).format('MMMM Do YYYY') }}</p>
+                        <p v-if="currentCommitment.guardian">To be finished at {{ moment(currentCommitment.finishedAt).format('MMMM Do YYYY') }}</p>
+                        <p>Guardian <span class="black-50 f6">{{ currentCommitment.guardian || 'None' }}</span>
+                            <div v-if="currentCommitment.guardian == null">
+                                <a class="f4 fw6 db dark-pink no-underline underline-hover"
+                                    v-bind:href="'/?guardingCommitment=' + currentCommitment.contractAddress">Give this link to your future guardian</a>
+                            </div>
+                        </p>
                         <small class="db pv2"><time>Commitment is {{ currentCommitment.state }}</time></small>
                     </div>
                     <div v-if="!llm.isGuarding()" class="pa3">
