@@ -116,7 +116,11 @@ contract Commitment {
         state = State.Opened;
 
         createdAt = now;
-        guardianDeposit = 2*(deposit / daysCount);
+        if (daysCount > 10) {
+            guardianDeposit = 2*(deposit / daysCount);
+        } else {
+            guardianDeposit = deposit / 5;
+        }
 
         emit Created(this, owner, deposit, title, daysCount, createdAt);
     }
@@ -219,7 +223,7 @@ contract Commitment {
         emit Closed(this, owner, daysCount, reportedDays, completedDays, x, y, now);
     }
 
-    function beGuardian()
+    function becomeGuardian()
     public
     payable
     {
