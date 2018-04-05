@@ -41,11 +41,6 @@
                             href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
                         <span class="pl1">Get guarding commitment</span>
                     </a>
-                    <a  v-if="currentCommitment && currentCommitment.guardian == null"
-                        v-on:click="becomeGuardian"
-                            href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
-                        <span class="pl1">Become guardian</span>
-                    </a>
                 </article>
 
                 <article v-if='showCurrentCommitment' class="mw6 bg-white ba b--black-10">
@@ -53,10 +48,10 @@
                         <h1 class="f6 ttu tracked">{{ currentCommitment.title }}</h1>
                     </div>
                     <div class="pa3">
-                        <p>You deposited {{ currentCommitment.deposit }} ether(s).</p>
-                        <p>You plan to finish your goal in {{ currentCommitment.daysCount }} day(s).</p>
-                        <p v-if="currentCommitment.guardian">Your guardian {{ currentCommitment.guardian }}.</p>
-                        <small class="gray db pv2"><time>Currently it is {{ currentCommitment.state }}</time></small>
+                        <p>Deposited {{ currentCommitment.deposit }} ether(s).</p>
+                        <p>Planned to finish in {{ currentCommitment.daysCount }} day(s).</p>
+                        <p v-if="currentCommitment.guardian">Guardian <span class="black-50 f6">{{ currentCommitment.guardian }}</span>.</p>
+                        <small class="db pv2"><time>Commitment is {{ currentCommitment.state }}</time></small>
                     </div>
                     <div v-if="!llm.isGuarding()" class="pa3">
                         <a v-if="currentCommitment.state=='Guarded'"
@@ -71,16 +66,21 @@
                         </a>
                     </div>
                     <div v-if="llm.isGuarding()" class="pa3">
-                        <a  v-if=""
-                            v-on:click="reportSuccess"
-                                href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-blue">
-                            <span class="pl1">Report success</span>
+                        <a  v-if="currentCommitment && currentCommitment.guardian == null"
+                            v-on:click="becomeGuardian"
+                                href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
+                            <span class="pl1">Become guardian</span>
                         </a>
-                        <a v-if=""
-                           v-on:click="reportFailure"
-                                href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-green">
-                            <span class="pl1">Report failure</span>
-                        </a>
+                        <div v-if="currentCommitment && currentCommitment.guardian == app.address && currentCommitment.state == 'Started'">
+                            <a v-on:click="reportSuccess"
+                                    href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-blue">
+                                <span class="pl1">Report success</span>
+                            </a>
+                            <a v-on:click="reportFailure"
+                                    href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-green">
+                                <span class="pl1">Report failure</span>
+                            </a>
+                        </div>
                     </div>
                 </article>
 

@@ -221,7 +221,7 @@ window.llm.currentCommitment = {
                         console.log(err.message);
                     } else {
                         console.log(logs);
-                        currentCommitment.reports = logs;
+                        // currentCommitment.reports = logs;
                     }
                 });
 
