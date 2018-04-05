@@ -18,8 +18,8 @@ await window.promisify(() => console.log('hello')); // did not work! why?
 
 window.llm = {
     /* config */
-    // https://ropsten.etherscan.io/address/0xdc147c2ae68867282803400f07597de2fb26f10c
-    FactoryContractAddress: '0xdc147c2ae68867282803400f07597de2fb26f10c',
+    // https://ropsten.etherscan.io/address/0x1e927cddb41e9347a47b23781a6a36e208575b73
+    FactoryContractAddress: '0x1e927cddb41e9347a47b23781a6a36e208575b73',
 
     help() {
         console.log(`
