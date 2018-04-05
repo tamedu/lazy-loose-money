@@ -43,7 +43,8 @@ window.llm = {
     },
 
     createCommitment(data, func) {
-        var value = Math.round(parseFloat(data.deposit) * web3.toWei(1, 'ether'));
+        data.value = Math.round(parseFloat(data.deposit) * web3.toWei(1, 'ether'));
+        console.log('Create commitment using data: ', data);
         this.factoryContractInstance.createCommitment(data.title,
             parseInt(data.daysCount), {'value': data.value }, function(err, res) {
         if (err) {
@@ -95,7 +96,7 @@ window.llm = {
         'Closed'
     ],
     // https://ropsten.etherscan.io/address/0xabc89d6e0569f9ee41d3a716b66b956d189d084a
-    FactoryContractAddress: '0xabc89d6e0569f9ee41d3a716b66b956d189d084a',
+    FactoryContractAddress: '0xd4e49dfa9f36b7dba40483d0a3782e53aebdaa84',
     /* run `solc --abi contracts/LazyLooseMoney.sol` to get the ABI jsons */
     abis: {
         // ======= contracts/LazyLooseMoney.sol:Commitment =======
