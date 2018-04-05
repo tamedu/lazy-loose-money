@@ -10,18 +10,22 @@ I'm thinking of asking a friend (roommate for example) to do the checking for me
 
 **Here is a solution**
 
-* If I cancel my commitment, I will loose half of my deposit money.
+* If I cancel my commitment, I will part of my deposit money.
 
 * If I keep my commitment contract run till the end:
 
     - My friend will get a portion of deposit money according to the number of days reported to the contract.
 
-    - I will get the portion of deposit money according to the number of days I finished my commitment.
+    - I will get back a portion of deposit money according to the number of days I finished my commitment.
+
 
 Later, we can add more features:
-* Supporters can visit and give the commitment some fund.
-* I can blame the guardian (did not report correctly, ...) and both I him will loose money ...
-* More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my committent is.
+
+* Supporters can visit and give the commitment some fund. Supporters are there to __encourage__ I and my guardian finishing the commitment. The main purpose is to say __nice words__ to make keep moving forward. Any fund supporters added should be treated as tip moneys (small amount)
+
+* I can blame the guardian (did not report correctly, ...) and both I him will loose money to make sure I won't false blame to get back more money
+
+* More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my committent is
 
 ## More game theory
 To avoid troll guardian (not implemented yet):
