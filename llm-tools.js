@@ -195,7 +195,7 @@ window.llm.currentCommitment = {
         });
     },
 
-    getInfo(func) {
+    getInfo(func, func2) {
         if (this.contractInstance == null) {
             console.log("Run llm.currentCommitment.getContractInstant() first");
             return;
@@ -217,13 +217,33 @@ window.llm.currentCommitment = {
                     finishedAt: new Date(res[7].toNumber()*1000),
                 };
                 // https://github.com/ethereum/wiki/wiki/JavaScript-API#contract-events
-                var events = window.llm.currentCommitment.contractInstance.Reported({fromBlock: 0, toBlock: 'latest'});
+                var events = window.llm.currentCommitment.contractInstance.Reported({}, {fromBlock: 0, toBlock: 'latest'});
                 events.get(function(err, logs) {
                     if (err) {
                         console.log(err.message);
                     } else {
                         console.log("Reported events:", logs);
-                        // currentCommitment.reports = logs;
+                        var dailyReports = [];
+                        var m = moment(currentCommitment.startedAt);
+                        var k = 0;
+                        for (var i = 0; i < currentCommitment.daysCount; i++) {
+                            dailyReports[i] = {
+                                date: m.add(i, 'days'),
+                                day: i,
+                                completed: null,
+                                reportedAt: null,
+                            }
+                            var reportedAt = logs[k].args.reportedAt.toNumber();
+                            var startedAt = res[6].toNumber();
+                            var days = Math.round((reportedAt - startedAt) / 86400); //  86400 = 60 * 60 * 24
+                            // console.log(reportedAt, startedAt, days);
+                            if (days == i) {
+                                dailyReports[i].completed = logs[k].args.completed;
+                                dailyReports[i].reportedAt = new Date(reportedAt*1000);
+                                k = k + 1;
+                            }
+                        } // end for
+                        if (func2) { func2(dailyReports); }
                     }
                 });
 

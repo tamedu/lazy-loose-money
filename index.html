@@ -91,6 +91,28 @@
                             </a>
                         </div>
                     </div>
+
+                    <div v-if="dailyReports">
+                    <h3 class="pl3">Daily reports: {{ dailyReports.length }}</h3>
+                    <table class="f6 w-100 mw8 center" cellspacing="0">
+                        <thead>
+                            <tr class="stripe-dark">
+                                <th class="fw6 tl pa3 bg-white">Day #</th>
+                                <th class="fw6 tl pa3 bg-white">Completed</th>
+                                <th class="fw6 tl pa3 bg-white">Reported at</th>
+                            </tr>
+                        </thead>
+                        <tbody class="lh-copy">
+                            <tr v-for="report in dailyReports"
+                                class="stripe-dark">
+                                <td class="pa3">{{ report.day + 1 }}</td>
+                                <td class="pa3">{{ report.completed }}</td>
+                                <td class="pa3">{{ moment(report.reportedAt).format('h:mm:ss a') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+
                 </article>
 
                 <article v-if='showCreateCommitmentForm' class="bg-white pa3 black-80">
@@ -140,6 +162,7 @@ var app = new Vue({
         address: '0x0',
         value: 0,
         currentCommitment: null,
+        dailyReports: null,
         commitment: {title: 'Running', deposit: 0.5, daysCount: 1},
         showCurrentCommitment: false,
         showCreateCommitmentForm: false,
@@ -175,6 +198,8 @@ var app = new Vue({
                 app.currentCommitment = currentCommitment;
                 app.notification = "Here is your guarding commitment sir!";
                 app.showCurrentCommitment = true;
+            }, function (dailyReports) {
+                app.dailyReports = dailyReports;
             });
         },
         newCommitment() {
@@ -203,6 +228,8 @@ var app = new Vue({
                         app.notification = "Here is your latest commitment sir!";
                         app.showCurrentCommitment = true;
                         app.updateAccountInfo();
+                    }, function (dailyReports) {
+                        app.dailyReports = dailyReports;
                     });
                 }
             });
