@@ -3,9 +3,7 @@
     use with Mist/MetaMask injected web3
 */
 
-(function () {
-
-// https://ethereum.stackexchange.com/questions/11444/web3-js-with-promisified-api
+/* // https://ethereum.stackexchange.com/questions/11444/web3-js-with-promisified-api
 window.promisify = (inner) =>
     new Promise((resolve, reject) =>
         inner((err, res) => {
@@ -13,8 +11,10 @@ window.promisify = (inner) =>
             resolve(res);
         })
     );
-// await window.promisify(() => console.log('hello')); // did not work! why?
+await window.promisify(() => console.log('hello')); // did not work! why?
+*/
 
+(function () {
 
 window.llm = {
     help() {
