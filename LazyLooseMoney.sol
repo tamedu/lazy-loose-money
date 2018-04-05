@@ -151,7 +151,7 @@ contract Commitment {
     payable
     {
         supportersFunded[msg.sender] += msg.value;
-        emit fundAdded(this, msg.sender, msg.value, encouragement);
+        emit fundAdded(this, msg.sender, msg.value, encouragement, now);
     }
     /* owner functions */
 
