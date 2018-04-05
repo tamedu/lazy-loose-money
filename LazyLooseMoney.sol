@@ -141,9 +141,9 @@ contract Commitment {
     function getInfo()
     public
     view
-    returns (address, string, uint, uint, uint, State, uint, uint)
+    returns (address, string, uint, uint, uint, State, uint, uint, address)
     {
-        return (owner, title, deposit, guardianDeposit, daysCount, state, startedAt, finishedAt);
+        return (owner, title, deposit, guardianDeposit, daysCount, state, startedAt, finishedAt, guardian);
     }
 
     function supportFund(string encouragement)
