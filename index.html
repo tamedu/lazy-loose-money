@@ -61,12 +61,12 @@
                     </div>
                     <div v-if="llm.isGuarding()" class="pa3">
                         <a  v-if=""
-                            v-on:click=""
+                            v-on:click="reportSuccess"
                                 href="#0" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-blue">
                             <span class="pl1">Report success</span>
                         </a>
                         <a v-if=""
-                           v-on:click=""
+                           v-on:click="reportFailure"
                                 href="#0" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-green">
                             <span class="pl1">Report failure</span>
                         </a>
@@ -126,6 +126,16 @@ var app = new Vue({
         notification: "Waiting for your command sir!",
     },
     methods: {
+        reportSuccess() {
+            llm.guardingCommitment.report(true, function () {
+
+            });
+        },
+        reportFailure() {
+            llm.guardingCommitment.report(false, function () {
+
+            });
+        }
         updateAccountInfo() {
             llm.accountInfo(function (accountAddress, balance) {
                 app.address = accountAddress;
@@ -143,7 +153,7 @@ var app = new Vue({
             app.showCreateCommitmentForm = true;
             app.showCurrentCommitment = false;
             app.notification = "Please enter details ...";
-            window.setTimeout(function(){ app.notification = "Hurry up! I'm waiting ... " }, 3000);
+            window.setTimeout(function(){ app.notification = "Hurry up! I'm waiting ... " }, 5000);
         },
         createCommitment() {
             llm.createCommitment(app.commitment, function () {
