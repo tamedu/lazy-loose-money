@@ -27,18 +27,18 @@
                 <article v-if="!llm.isGuarding()" class="mb2 mt3">
                     <a  v-if="!(currentCommitment && currentCommitment.state == null)"
                         v-on:click="getCurrentCommitment"
-                            href="#0" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
+                            href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
                         <span class="pl1">Current commitment</span>
                     </a>
                     <a  v-if="currentCommitment && (currentCommitment.state == null || currentCommitment.state=='Closed')"
                         v-on:click="newCommitment"
-                            href="#0" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black mt2">
+                            href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black mt2">
                         <span class="pl1">New commitment</span>
                     </a>
                 </article>
                 <article v-if="llm.isGuarding()" class="mb2 mt3">
                     <a  v-on:click="getGuardingCommitment"
-                            href="#0" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
+                            href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
                         <span class="pl1">Get guarding commitment</span>
                     </a>
                 </article>
@@ -55,19 +55,19 @@
                     <div v-if="!llm.isGuarding()" class="pa3">
                         <a v-if="currentCommitment.state != null && currentCommitment.state!='Closed'"
                            v-on:click="cancelCurrentCommitment"
-                                href="#0" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-mid-gray">
+                                href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-mid-gray">
                             <span class="pl1">Cancel</span>
                         </a>
                     </div>
                     <div v-if="llm.isGuarding()" class="pa3">
                         <a  v-if=""
                             v-on:click="reportSuccess"
-                                href="#0" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-blue">
+                                href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-blue">
                             <span class="pl1">Report success</span>
                         </a>
                         <a v-if=""
                            v-on:click="reportFailure"
-                                href="#0" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-green">
+                                href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-green">
                             <span class="pl1">Report failure</span>
                         </a>
                     </div>
