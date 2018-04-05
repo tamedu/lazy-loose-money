@@ -41,7 +41,8 @@
                             href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
                         <span class="pl1">Get guarding commitment</span>
                     </a>
-                    <a  v-on:click="becomeGuardian"
+                    <a  v-if="currentCommitment && currentCommitment.guardian == null"
+                        v-on:click="becomeGuardian"
                             href="#" class="f5 link dim ba bw1 ph3 pv2 mb2 dib near-black">
                         <span class="pl1">Become guardian</span>
                     </a>
@@ -58,7 +59,7 @@
                         <small class="gray db pv2"><time>Currently it is {{ currentCommitment.state }}</time></small>
                     </div>
                     <div v-if="!llm.isGuarding()" class="pa3">
-                        <a v-if="currentCommitment.state != null && currentCommitment.state!='Closed'"
+                        <a v-if="currentCommitment.state=='Guarded'"
                            v-on:click="startCurrentCommitment"
                                 href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-blue">
                             <span class="pl1">Start</span>
