@@ -59,6 +59,11 @@
                     </div>
                     <div v-if="!llm.isGuarding()" class="pa3">
                         <a v-if="currentCommitment.state != null && currentCommitment.state!='Closed'"
+                           v-on:click="startCurrentCommitment"
+                                href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-dark-blue">
+                            <span class="pl1">Start</span>
+                        </a>
+                        <a v-if="currentCommitment.state != null && currentCommitment.state!='Closed'"
                            v-on:click="cancelCurrentCommitment"
                                 href="#" class="f6 grow no-underline br-pill ph3 pv2 mb2 dib white bg-mid-gray">
                             <span class="pl1">Cancel</span>
@@ -143,6 +148,11 @@ var app = new Vue({
         },
         becomeGuardian() {
             llm.guardingCommitment.becomeGuardian(currentCommitment);
+        },
+        startCurrentCommitment() {
+            llm.currentCommitment.commit(function () {
+
+            });
         },
         updateAccountInfo() {
             llm.accountInfo(function (accountAddress, balance) {
