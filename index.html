@@ -62,7 +62,7 @@
                         <p>Guarded by <span class="black-50 fw6 f6">{{ currentCommitment.guardian == app.address ? 'You' : currentCommitment.guardian || 'None' }}</span>
                             <div v-if="currentCommitment.guardian == null">
                                 <a class="f4 fw6 db dark-pink no-underline underline-hover"
-                                    v-bind:href="'/?guardingCommitment=' + currentCommitment.contractAddress">Give this link to your future guardian</a>
+                                    v-bind:href="'?guardingCommitment=' + currentCommitment.contractAddress">Give this link to your future guardian</a>
                             </div>
                         </p>
                         <small class="db pv2"><time>Commitment is {{ currentCommitment.state }}</time></small>
