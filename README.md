@@ -27,6 +27,9 @@ Later, we can add more features:
 
 * More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my committent is
 
+* Link with real data. See https://github.com/Cryptizens/cryptorun-back for example ![alt text](https://s3.eu-central-1.amazonaws.com/cryptorun.be/cryptorun-architecture.png "Back-end architecture")
+
+
 ## More game theory
 To avoid troll guardian (not implemented yet):
 * Guardian need to deposit some money
