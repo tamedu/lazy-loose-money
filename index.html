@@ -11,7 +11,7 @@
 <body class="black-80 sans-serif bg-near-white">
     <main id="app" class="flex flex-column items-center">
         <div class="mw7 w-100 ph3 ph4-ns">
-            <header>
+            <header class="w-100">
                 <div class="f7">
                     The contract is deployed at Ropsten Test Net
                     <a href="https://ropsten.etherscan.io/address/0x1e927cddb41e9347a47b23781a6a36e208575b73">
@@ -23,7 +23,7 @@
             </header>
 
             <div class="mw7 w-100 f5 f4-ns fw3 lh-copy mb0">
-                <div class="flex items-center justify-center pa2 pa4-ns bg-lightest-blue navy mb2">
+                <div class="flex items-center justify-center pa2 pa4-ns bg-lightest-blue navy mb2 w-100">
                   <svg class="w1" data-icon="info" viewBox="0 0 32 32" style="fill:currentcolor">
                     <title>info icon</title>
                     <path d="M16 0 A16 16 0 0 1 16 32 A16 16 0 0 1 16 0 M19 15 L13 15 L13 26 L19 26 z M16 6 A3 3 0 0 0 16 12 A3 3 0 0 0 16 6"></path>
@@ -50,7 +50,7 @@
                     </a>
                 </article>
 
-                <article v-if='showCurrentCommitment' class="mw6 bg-white ba b--black-10">
+                <article v-if='showCurrentCommitment' class="mw6 bg-white ba b--black-10 fl w-100 w-50-ns">
                     <div class="pv2 ph3">
                         <h1 class="f6 ttu tracked">{{ currentCommitment.title }}</h1>
                     </div>
@@ -59,7 +59,7 @@
                         <p>Planned to finish in {{ currentCommitment.daysCount }} day(s)</p>
                         <p v-if="currentCommitment.state=='Started'">Started at {{ moment(currentCommitment.startedAt).format('MMMM Do YYYY') }}</p>
                         <p v-if="currentCommitment.state=='Started'">To be finished at {{ moment(currentCommitment.finishedAt).format('MMMM Do YYYY') }}</p>
-                        <p>Guarded by <span class="black-50 fw6 f6">{{ currentCommitment.guardian == app.address ? 'You' : currentCommitment.guardian || 'None' }}</span>
+                        <p>Guarded by <span class="black-50 fw6 f6">{{ currentCommitment.guardian == app.address ? 'You' : currentCommitment.guardian ? currentCommitment.guardian.substr(0,10) + '...' + currentCommitment.guardian.substr(30,12) : 'None' }}</span>
                             <div v-if="!llm.isGuarding() && currentCommitment.guardian == null">
                                 <a class="f4 fw6 db dark-pink no-underline underline-hover"
                                     v-bind:href="'?guardingCommitment=' + currentCommitment.contractAddress">Give this link to your future guardian</a>
@@ -96,9 +96,12 @@
                             </a>
                         </div>
                     </div>
+                </article>
 
-                    <div v-if="dailyReports">
-                    <h3 class="pl3">Daily reports</h3>
+                <div v-if='dailyReports' class="mw6 bg-white ba b--black-10 fl w-100 w-50-ns">
+                    <div class="pv2 ph3">
+                        <h1 class="f6 ttu tracked">Daily reports</h1>
+                    </div>
                     <table class="f6 w-100 mw8 center" cellspacing="0">
                         <thead>
                             <tr class="stripe-dark">
@@ -116,8 +119,8 @@
                             </tr>
                         </tbody>
                     </table>
-                    </div>
-                </article>
+                </div>
+
 
                 <article v-if='showCreateCommitmentForm' class="bg-white pa3 black-80">
                   <form accept-charset="utf-8">
@@ -144,8 +147,8 @@
                     </div>
                 </form>
                 </article>
-
             </div>
+
         </div>
       </main>
 </body>

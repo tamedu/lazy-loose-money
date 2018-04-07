@@ -115,12 +115,12 @@ window.llm.guardingCommitment = {
     getContractInstant() {
         return window.llm.commimentContract.at(this.getContractAddress());
 },
-    getInfo(func) {
+    getInfo(func, func2) {
         window.llm.currentCommitment.contractInstance = this.getContractInstant();
         window.llm.currentCommitment.getInfo(function () {
             window.llm.currentCommitment.contractInstance = null;
             if (func) { func(); }
-        });
+        }, func2);
     },
     report(completed, func) {
         this.getContractInstant().report(completed, function (err, res) {
@@ -241,6 +241,7 @@ window.llm.currentCommitment = {
                                 dailyReports[i].completed = logs[k].args.completed;
                                 dailyReports[i].reportedAt = new Date(reportedAt*1000);
                                 k = k + 1;
+                                if (k >= logs.length) { break; }
                             }
                         } // end for
                         if (func2) { func2(dailyReports); }
