@@ -118,7 +118,7 @@
                                 class="stripe-dark">
                                 <td class="pa3">{{ report.day + 1 }}</td>
                                 <td class="pa3">{{ report.completed }}</td>
-                                <td class="pa3">{{ moment(report.reportedAt).format('h:mm:ss a') }}</td>
+                                <td class="pa3">{{ report.reportedAt ? moment(report.reportedAt).format('h:mm:ss a') : 'None' }}</td>
                             </tr>
                         </tbody>
                     </table>
