@@ -1,4 +1,4 @@
-https://tamedu.github.io/lazy-loose-money
+The dapp https://tamedu.github.io/lazy-loose-money
 
 Running on `Ropsten Testnet`, contract address [0x34bdced976429993238aeb44347a8f9ce23d25d2](https://ropsten.etherscan.io/address/0x34bdced976429993238aeb44347a8f9ce23d25d2)
 
