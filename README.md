@@ -3,7 +3,24 @@ https://tamedu.github.io/lazy-loose-money
 Running on `Ropsten Testnet`, contract address [0x34bdced976429993238aeb44347a8f9ce23d25d2](https://ropsten.etherscan.io/address/0x34bdced976429993238aeb44347a8f9ce23d25d2)
 
 # Lazy Loose Money
+<!-- TOC START min:2 max:3 link:true update:true -->
+- [Problem & solution](#problem--solution)
+- [More game theory](#more-game-theory)
+- [Smart contract development and deployment](#smart-contract-development-and-deployment)
+- [JavaScript CLI tools](#javascript-cli-tools)
+- [References](#references)
+  - [Web3js (the version injected by Mist/MetaMask)](#web3js-the-version-injected-by-mistmetamask)
+  - [Solidity programming language](#solidity-programming-language)
+  - [BurnablePayment solidity contract](#burnablepayment-solidity-contract)
+  - [Vuejs: My Automatic View ^_^](#vuejs-my-automatic-view-_)
+  - [tachyons: styling your HTML without touching CSS code :)](#tachyons-styling-your-html-without-touching-css-code-)
+  - [Stickk app](#stickk-app)
 
+<!-- TOC END -->
+
+
+
+## Problem & solution
 Let say that i want to do running for 1 hour everyday for 100 days. I create a contract and deposit $100 in it. Everyday, I need to (somehow) inform the contract that I finish my running or not. Then after 100 days passed, depend on the completeness of my report, the contract will do some punishment. For example: lock $100 for 10 more-day for each day I did not do the running. So if I skip running for 6 day, the money will be lock there for 2-months. Other kinds of punishment could be: Burn a part of deposit money, give it to someone ...
 
 I'm thinking of asking a friend (roommate for example) to do the checking for me. And how should I incentive my friend to inform the contract regularly and CORRECTLY?
