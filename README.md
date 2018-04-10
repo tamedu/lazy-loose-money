@@ -40,18 +40,17 @@ Later, we can add more features:
 
 * Supporters can visit and give the commitment some fund. Supporters are there to __encourage__ I and my guardian finishing the commitment. The main purpose is to say __nice words__ to make keep moving forward. Any fund supporters added should be treated as tip moneys (small amount)
 
-* I can blame the guardian (did not report correctly, ...) and both I him will loose money to make sure I won't false blame to get back more money
+* Guardian can report a pending day, and give a resonable reason why committer can not fullfill his daily commitment (got sick for example)
 
-* More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my committent is
+* More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my commitment is
 
 * Link with real data. See https://github.com/Cryptizens/cryptorun-back for example ![alt text](https://s3.eu-central-1.amazonaws.com/cryptorun.be/cryptorun-architecture.png "Back-end architecture")
 
 
 ## More game theory
-To avoid troll guardian (not implemented yet):
-* Guardian need to deposit some money
-* committer can `complain` if guardian reported wrongly. In this case both committer and guardian loose money
-* After complain for 3 times, committer can `fire` his guardian to find a more realiable one
+To avoid troll guardian:
+* Guardian need to deposit some money (implemented)
+* Guardian have responsibility to warranty committer daily success. If guardian reported a day as failure, both committer and guardian loose money.
 
 ## Smart contract development and deployment
 Copy Solidity code from `LazyLooseMoney.sol` and paste it to http://remix.ethereum.org
