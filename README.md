@@ -42,7 +42,9 @@ Later, we can add more features:
 
 * Guardian can report a pending day, and give a resonable reason why committer can not fullfill his daily commitment (got sick for example)
 
-* More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my commitment is
+* More than one person can be guardians, and guradians can co-report me commitment. The more guradians join, the stronger my commitment is.
+
+* Above features can be extended to a group committers who commit to a same goal and guard each others.
 
 * Link with real data. See https://github.com/Cryptizens/cryptorun-back for example ![alt text](https://s3.eu-central-1.amazonaws.com/cryptorun.be/cryptorun-architecture.png "Back-end architecture")
 
@@ -51,7 +53,9 @@ Later, we can add more features:
 To avoid troll guardian:
 * Guardian need to deposit some money (implemented)
 * Guardian have responsibility to warranty committer daily success. If guardian reported a day as failure, both committer and guardian loose money.
-
+* Committer can `complain` if guardian reported wrongly. In this case both committer and guardian loose money
+* After complain for 3 times, committer can `fire` his guardian to find a more realiable one
+*
 ## Smart contract development and deployment
 Copy Solidity code from `LazyLooseMoney.sol` and paste it to http://remix.ethereum.org
 
