@@ -1,3 +1,4 @@
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/tamedu/lazy-loose-money.png?columns=all)](https://waffle.io/tamedu/lazy-loose-money?utm_source=badge)
 The dapp https://tamedu.github.io/lazy-loose-money
 
 Running on `Ropsten Testnet`, contract address [0x1e927cddb41e9347a47b23781a6a36e208575b73](https://ropsten.etherscan.io/address/0x1e927cddb41e9347a47b23781a6a36e208575b73)
