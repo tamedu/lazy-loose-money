@@ -56,7 +56,7 @@ To avoid troll guardian:
 * Guardian need to deposit some money (implemented)
 * Guardian have responsibility to warranty committer daily success. If guardian reported a day as failure, both committer and guardian loose money.
 * Committer can `complain` if guardian reported wrongly. In this case both committer and guardian loose money
-* After complain for 3 times, committer can `fire` his guardian to find a more realiable one
+* After complain for 3 times, committer can `fire` his guardian to find a more reliable one
 *
 ## Smart contract development and deployment
 Copy Solidity code from `LazyLooseMoney.sol` and paste it to http://remix.ethereum.org
